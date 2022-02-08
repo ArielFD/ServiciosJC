@@ -1,6 +1,22 @@
 <template>
   <q-page>
-    <h5>Vueltas</h5>
+    <h5>{{ data.star }}</h5>
+    <div class="row">
+      <q-input
+        v-model="data.star"
+        filled
+        type="date"
+        hint="Desde"
+        class="col q-pa-xs q-mb-sm"
+      />
+      <q-input
+        v-model="data.end"
+        filled
+        type="date"
+        hint="Hasta"
+        class="col q-pa-xs q-mb-sm"
+      />
+    </div>
     <q-table
       title="Ingresos"
       dense
@@ -71,6 +87,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+import moment from "moment";
 
 export default {
   setup() {
@@ -109,6 +126,8 @@ export default {
         },
       ],
       rows: [],
+      star: "",
+      end: "",
       search: "",
       precioServicio: 10,
       cantVueltas: 1,
@@ -144,6 +163,27 @@ export default {
           console.log(error);
         });
     });
+
+    function getDates(startDate, stopDate) {
+      var dateArray = data.rows;
+      var currentDate = moment(startDate).format("DD-MM-YYYY");
+      var stopDate = moment(stopDate).format("DD-MM-YYYY");
+      dateArray.forEach((element) => {
+        if (
+          moment(element.name).format("DD-MM-YYYY") >= currentDate &&
+          moment(element.name).format("DD-MM-YYYY") <= stopDate
+        ) {
+          console.log("true");
+        }else{
+          element.category=""
+        }
+      });
+      while (currentDate <= stopDate) {
+        dateArray.push(moment(currentDate).format("DD-MM-YYYY"));
+        currentDate = moment(currentDate).add(1, "days");
+      }
+      return dateArray;
+    }
 
     let filter = computed(() => {
       return {
@@ -212,6 +252,12 @@ export default {
 
     function aumentarSaldo() {
       // /api/ingresos/:id
+      console.log(
+        getDates(
+          data.star.split("-").reverse().join("-"),
+          data.end.split("-").reverse().join("-")
+        )
+      );
       selected.value.forEach(function (item, index, array) {
         axios
           .put(
@@ -282,6 +328,7 @@ export default {
       disminuirSaldo,
       customFilter,
       filter,
+      getDates,
     };
   },
 };

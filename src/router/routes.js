@@ -10,16 +10,6 @@ const routes = [
         component: () => import("src/pages/Login.vue"),
       },
       {
-        path: "/administrador",
-        name: "administrador",
-        component: () => import("src/pages/Administrador.vue"),
-      },
-      {
-        path: "/cajero",
-        name: "cajero",
-        component: () => import("src/pages/Cajero.vue"),
-      },
-      {
         path: "/cambiarpass",
         name: "cambiarpass",
         component: () => import("src/pages/Cambiar_pass.vue"),
@@ -28,11 +18,6 @@ const routes = [
         path: "/editarinf",
         name: "editarinf",
         component: () => import("src/pages/Editar_inf.vue"),
-      },
-      {
-        path: "/encargado",
-        name: "encargado",
-        component: () => import("src/pages/Encargado.vue"),
       },
       {
         path: "/entercode",

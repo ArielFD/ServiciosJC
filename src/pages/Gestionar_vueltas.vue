@@ -164,6 +164,15 @@ export default {
         });
     });
 
+    let filter = computed(() => {
+      return {
+        search: data.search,
+        breakfast: data.filterToggle.breakfast,
+        // lunch: data.filterToggle.lunch,
+        // dinner: data.filterToggle.dinner,
+      };
+    });
+
     function getDates(startDate, stopDate) {
       var dateArray = data.rows;
       var currentDate = moment(startDate).format("DD-MM-YYYY");
@@ -174,25 +183,11 @@ export default {
           moment(element.name).format("DD-MM-YYYY") <= stopDate
         ) {
           console.log("true");
-        }else{
-          element.category=""
+        } else {
+          element.category = "";
         }
       });
-      while (currentDate <= stopDate) {
-        dateArray.push(moment(currentDate).format("DD-MM-YYYY"));
-        currentDate = moment(currentDate).add(1, "days");
-      }
-      return dateArray;
     }
-
-    let filter = computed(() => {
-      return {
-        search: data.search,
-        breakfast: data.filterToggle.breakfast,
-        // lunch: data.filterToggle.lunch,
-        // dinner: data.filterToggle.dinner,
-      };
-    });
 
     function customFilter(rows, terms) {
       // rows contain the entire data
@@ -251,13 +246,6 @@ export default {
     }
 
     function aumentarSaldo() {
-      // /api/ingresos/:id
-      console.log(
-        getDates(
-          data.star.split("-").reverse().join("-"),
-          data.end.split("-").reverse().join("-")
-        )
-      );
       selected.value.forEach(function (item, index, array) {
         axios
           .put(
@@ -289,7 +277,6 @@ export default {
     }
 
     function disminuirSaldo() {
-      // /api/ingresos/:id
       selected.value.forEach(function (item, index, array) {
         axios
           .put(

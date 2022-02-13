@@ -74,10 +74,14 @@ export default {
         })
         .then((response) => {
           console.log("Your user's password has been reset.");
+          store.state.alerts[1].message="Sesion Iniciada!"
+          $q.notify(store.state.alerts[1])
           router.push("/");
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
+          store.state.alerts[1].message="Sesion Iniciada!"
+          $q.notify(store.state.alerts[1])
         });
     }
     return {

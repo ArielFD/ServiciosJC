@@ -42,9 +42,9 @@
       <q-dialog v-model="data.card">
         <q-card class="my-card">
           <q-card-section>
-          <div class="text-h6">Edit</div>
-        </q-card-section>
-        
+            <div class="text-h6">Edit</div>
+          </q-card-section>
+
           <q-card-section>
             <q-input v-model="data.username" label="Nombre de Usuario" />
             <q-input
@@ -158,8 +158,8 @@ export default {
         .get("http://localhost:1337/api/users", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDAzNDEyMiwiZXhwIjoxNjQ2NjI2MTIyfQ.ixzyJ6L19ctekhVbeqJNZ3Gw-9mp40lUAo6_UhLjMc8",
-          },
+              "Bearer "+store.state.jwt,
+              },
         })
         .then(function (response) {
           for (let i = 0; i < response.data.length; i++) {
@@ -185,8 +185,8 @@ export default {
           confirmed: data.confirmed,
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDQyNDQzNSwiZXhwIjoxNjQ3MDE2NDM1fQ.KcdGFK94K-7Hhh6XNhvTbk1jPZ0rlE_vOFdXis-9vps",
-          },
+              "Bearer "+store.state.jwt,
+              },
         })
         .then(function (response) {
           console.log(response);
@@ -201,8 +201,8 @@ export default {
         .delete(`http://localhost:1337/api/users/${selected.value[0].id}`, {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDQyNDQzNSwiZXhwIjoxNjQ3MDE2NDM1fQ.KcdGFK94K-7Hhh6XNhvTbk1jPZ0rlE_vOFdXis-9vps",
-          },
+              "Bearer "+store.state.jwt,
+              },
         })
         .then(function (response) {
           console.log(response);
@@ -217,12 +217,15 @@ export default {
         .put(`http://localhost:1337/api/users/${selected.value[0].id}`, {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDQyNDQzNSwiZXhwIjoxNjQ3MDE2NDM1fQ.KcdGFK94K-7Hhh6XNhvTbk1jPZ0rlE_vOFdXis-9vps",
-          },
+              "Bearer "+store.state.jwt,
+              },
           email: data.email,
           username: data.username,
           password: data.password,
           confirmed: data.confirmed,
+          role: {
+            id: 5,
+          },
         })
         .then(function (response) {
           console.log(response);
@@ -296,7 +299,6 @@ export default {
           } selected of ${data.rows.length}`;
       log;
     }
-
 
     return {
       data,

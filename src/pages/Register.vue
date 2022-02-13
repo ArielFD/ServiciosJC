@@ -44,13 +44,13 @@
 import { ref, inject, computed, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
+import { useQuasar } from "quasar";
 
 export default {
-  
   setup() {
-
     const router = useRouter();
     const route = useRoute();
+    const $q = useQuasar();
 
     let data = reactive({
       password: "",
@@ -74,20 +74,28 @@ export default {
             })
             .then((response) => {
               console.log("Your user received an email");
+              store.state.alerts[0].message =
+                "Se le ha enviado un email de confirmacion!";
+              $q.notify(store.state.alerts[1]);
               router.push("/");
             })
             .catch((error) => {
               console.error("An error occurred:", error.response);
+              store.state.alerts[0].message =
+                "Error al enviar el email de confirmacion!";
+              $q.notify(store.state.alerts[0]);
             });
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
+          store.state.alerts[0].message = "Error al registrar el usuario!";
+          $q.notify(store.state.alerts[0]);
         });
     }
-    
+
     return {
       data,
-      register
+      register,
     };
   },
 };

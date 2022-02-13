@@ -7,7 +7,7 @@ module.exports = ({ env }) => ({
         port: env("SMTP_PORT", 465),
         auth: {
           user: env("SMTP_USERNAME", "arielferrera1992@gmail.com"),
-          pass: env("SMTP_PASSWORD", "frotvaybnnefswcm"),
+          pass: env("SMTP_PASSWORD", "fbcurquqverulnrs"),
         },
         // ... any custom nodemailer options
       },

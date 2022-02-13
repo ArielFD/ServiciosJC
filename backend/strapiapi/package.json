@@ -31,5 +31,6 @@
     "npm": ">=6.0.0"
   },
   "license": "MIT",
-  "main": "index.js"
+  "main": "index.js",
+  "devDependencies": {}
 }

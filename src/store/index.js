@@ -3,28 +3,27 @@ import axios from "axios";
 
 
 const state = reactive({
-  jwt: ""
+  jwt: "",
+  alerts : [
+    { color: 'negative',message:'', icon: 'error'},
+    { color: 'positive', message: '', icon: 'done' },
+    { color: 'warning', message: '', icon: 'warning' },
+  ],
+  emailRules:[
+    val => (val && val.length > 0) || 'Please type something'
+  ],
+  inputRules:[
+    val => (val && val.length > 0) || 'Please type something',
+  ],
+  ageRules:[],
+  passRules:[],
 });
 
 const methods = {
 
-  
-
-  async requestUsers() {
-    const { data } = await axios.get("http://localhost:1337/users", {
-      headers: {
-        Authorization: "Bearer " + state.jwt,
-      },
-    });
-
-    console.log(data);
-  },
 };
 
 const getters = {
-  verMail() {
-    return state.email;
-  },
 };
 
 export default {

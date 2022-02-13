@@ -32,9 +32,9 @@ var app=express();
 //     })
 // })
 
-// app.listen(3000,()=>{
-//     console.log("local 3000");
-// })
+app.listen(3000,()=>{
+    console.log("local 3000");
+})
 
 
 ///===================================================================Login Registred User===================================================================
@@ -97,3 +97,5 @@ var app=express();
   // .catch(error => {
   //   console.error('An error occurred:', error.response);
   // });
+
+  console.log(strapi.query('user', 'users-permissions').find());

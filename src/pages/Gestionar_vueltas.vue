@@ -141,7 +141,7 @@ export default {
         .get("http://localhost:1337/api/ingresos", {
           headers: {
             Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDAzNDEyMiwiZXhwIjoxNjQ2NjI2MTIyfQ.ixzyJ6L19ctekhVbeqJNZ3Gw-9mp40lUAo6_UhLjMc8",
+              "Bearer "+store.state.jwt,
           },
         })
         .then(function (response) {
@@ -253,8 +253,8 @@ export default {
             {
               headers: {
                 Authorization:
-                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDAzNDEyMiwiZXhwIjoxNjQ2NjI2MTIyfQ.ixzyJ6L19ctekhVbeqJNZ3Gw-9mp40lUAo6_UhLjMc8",
-              },
+                  "Bearer "+store.state.jwt,
+                  },
               data: {
                 Cantidad:
                   selected.value[index].Cantidad +
@@ -284,8 +284,8 @@ export default {
             {
               headers: {
                 Authorization:
-                  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDAzNDEyMiwiZXhwIjoxNjQ2NjI2MTIyfQ.ixzyJ6L19ctekhVbeqJNZ3Gw-9mp40lUAo6_UhLjMc8",
-              },
+                  "Bearer "+store.state.jwt,
+                  },
               data: {
                 Cantidad:
                   selected.value[index].Cantidad -

@@ -4,21 +4,16 @@
   "info": {
     "singularName": "cliente",
     "pluralName": "clientes",
-    "displayName": "Cliente"
+    "displayName": "Cliente",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
   "attributes": {
-    "NombreCliente": {
+    "JustForValidationRol": {
       "type": "string"
-    },
-    "ApellidosCliente": {
-      "type": "string"
-    },
-    "CICliente": {
-      "type": "biginteger"
     }
   }
 }

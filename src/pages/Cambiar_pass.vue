@@ -55,7 +55,7 @@ export default {
     const route = useRoute();
 
     onMounted(() => {
-      console.log(route.query);
+      console.log(route.query.code);
     });
     
     let data = reactive({
@@ -68,7 +68,7 @@ export default {
     async function resetPass() {
       axios
         .post("http://localhost:1337/api/auth/reset-password", {
-          code: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDAzNDEyMiwiZXhwIjoxNjQ2NjI2MTIyfQ.ixzyJ6L19ctekhVbeqJNZ3Gw-9mp40lUAo6_UhLjMc8",
+          code: route.query.code,
           password: data.newPass,
           passwordConfirmation: data.confirmationPass,
         })

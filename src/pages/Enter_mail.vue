@@ -34,10 +34,14 @@ export default {
         })
         .then((response) => {
           console.log("Your user received an email");
+          store.state.alerts[1].message="Enviado email de confirmacion!"
+          $q.notify(store.state.alerts[1])
           router.push("/entercode");
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
+          store.state.alerts[0].message="Error con el envio de emai de confirmacion!"
+          $q.notify(store.state.alerts[0])
         });
     }
     return {

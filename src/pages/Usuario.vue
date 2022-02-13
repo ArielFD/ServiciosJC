@@ -19,6 +19,7 @@ import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
 export default {
   setup() {
+    const store = inject("store");
     let data = reactive({
       columns: [
         {
@@ -39,14 +40,16 @@ export default {
         },
       ],
       rows: [],
+      jwt:store.state.jwt
     });
 
     onMounted(() => {
+      console.log("jwt",data.jwt);
          axios
-          .get("http://localhost:1337/api/usuarios", {
+          .get("http://localhost:1337/api/servicios", {
             headers: {
               Authorization:
-                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDAzNDEyMiwiZXhwIjoxNjQ2NjI2MTIyfQ.ixzyJ6L19ctekhVbeqJNZ3Gw-9mp40lUAo6_UhLjMc8",
+                "Bearer "+data.jwt,
             },
           })
           .then(function (response) {
@@ -61,6 +64,8 @@ export default {
           .catch(function (error) {
             console.log(error);
           });
+
+          
       
     });
 

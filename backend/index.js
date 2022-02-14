@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+require('dotenv').config()
+console.log(procces.env);
 // Request API.
 axios
   .post('http://localhost:1337/api/auth/local', {

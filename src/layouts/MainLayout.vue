@@ -71,7 +71,7 @@ const linksListAdmin = [
     caption: "Gestionar Clientes",
     icon: "group_add",
     link: "/editInf",
-  }
+  },
 ];
 
 const linksListAuth = [
@@ -86,12 +86,13 @@ const linksListAuth = [
     caption: "Gestionar vueltas",
     icon: "cached",
     link: "/editInf",
-  }
+  },
 ];
 
-import { defineComponent, ref, reactive, computed } from "vue";
+import { defineComponent, ref, reactive, computed, watch } from "vue";
 import { onMounted, onUpdated, onUnmounted, inject } from "vue";
 import axios from "axios";
+import { useRouter, useRoute } from "vue-router";
 
 export default defineComponent({
   name: "MainLayout",
@@ -101,6 +102,8 @@ export default defineComponent({
   },
 
   setup() {
+    const router = useRouter();
+    const route = useRoute();
     const store = inject("store");
     const leftDrawerOpen = ref(false);
     let data = reactive({
@@ -112,45 +115,55 @@ export default defineComponent({
           link: "/",
         },
       ],
+      jwt: store.state.jwt,
     });
-// + store.state.jwt,
-    onMounted(() => {
-      axios
-        .get("http://localhost:1337/api/clientes", {
-          headers: {
-            Authorization: "Bearer "+ store.state.jwt,
-          },
-        })
-        .then(function (response) {
+    // + store.state.jwt,
+    onMounted(() => {});
+
+    const interval = setInterval(function () {
+      sendGetRequest();
+    }, 5000);
+
+    const sendGetRequest = async () => {
+      try {
+        const resp = await axios
+          .get("http://localhost:1337/api/clientes", {
+            headers: {
+              Authorization: "Bearer " + store.state.jwt,
+            },
+          })
+          .then(function (response) {
             console.log(response);
-            if(response.data.role.id===3){
-              linksListAdmin.forEach(element => {
-                data.linkslist.unshift(
-                  {
-                    title:element.title,
-                    caption:element.caption,
-                    icon:element.icon,
-                    link:element.link
-                  }
-                )
+            if (response.data.role.id === 3) {
+              linksListAdmin.forEach((element) => {
+                data.linkslist.unshift({
+                  title: element.title,
+                  caption: element.caption,
+                  icon: element.icon,
+                  link: element.link,
+                });
               });
-            }else if(response.data.role.id===1){
-              linksListAuth.forEach(element => {
-                data.linkslist.unshift(
-                  {
-                    title:element.title,
-                    caption:element.caption,
-                    icon:element.icon,
-                    link:element.link
-                  }
-                )
+              clearInterval(interval);
+            } else if (response.data.role.id === 1) {
+              linksListAuth.forEach((element) => {
+                data.linkslist.unshift({
+                  title: element.title,
+                  caption: element.caption,
+                  icon: element.icon,
+                  link: element.link,
+                });
               });
             }
-        })
-        .catch(function (error) {
-          console.log(error);
+            clearInterval(interval);
+          })
+          .catch(function (error) {
+            console.log(error);
           });
-    });
+      } catch (err) {
+        // Handle Error Here
+        console.log(err);
+      }
+    };
 
     return {
       data,
@@ -159,6 +172,7 @@ export default defineComponent({
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
+      sendGetRequest,
     };
   },
 });

@@ -7,8 +7,9 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "axios": "^0.25.0"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }

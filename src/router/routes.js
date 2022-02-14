@@ -6,62 +6,62 @@ const routes = [
     children: [
       {
         path: "",
-        name: "LOGIN",
+        name: "Login",
         component: () => import("src/pages/Login.vue"),
       },
       {
         path: "/cambiarpass",
-        name: "cambiarpass",
+        name: "Cambiar_Password",
         component: () => import("src/pages/Cambiar_pass.vue"),
       },
       {
         path: "/editarinf",
-        name: "editarinf",
+        name: "Editar_Password",
         component: () => import("src/pages/Editar_inf.vue"),
       },
       {
         path: "/entercode",
-        name: "entercode",
+        name: "Entrar_Codigo",
         component: () => import("src/pages/Enter_code.vue"),
       },
       {
         path: "/entermail",
-        name: "enteremail",
+        name: "Entrar_Email",
         component: () => import("src/pages/Enter_mail.vue"),
       },
       {
         path: "/gestionaringresos",
-        name: "gestionaringresos",
+        name: "Gestionar_Ingresos",
         component: () => import("src/pages/Gestionar_ingresos.vue"),
       },
       {
         path: "/gestionarrol",
-        name: "gestionarrol",
+        name: "Gestionar_Roles",
         component: () => import("src/pages/Gestionar_rol.vue"),
       },
       {
         path: "/gestionarusuarios",
-        name: "gestionarusuario",
+        name: "Gestionar_Usuarios",
         component: () => import("src/pages/Gestionar_usuarios.vue"),
       },
       {
         path: "/gestionarvueltas",
-        name: "gestionarvueltas",
+        name: "Gestionar_Vueltas",
         component: () => import("src/pages/Gestionar_vueltas.vue"),
       },
       {
         path: "/nuevocliente",
-        name: "nuevocliente",
+        name: "Nuevo_Cliente",
         component: () => import("src/pages/Nuevo_cliente.vue"),
       },
       {
         path: "/register",
-        name: "register",
+        name: "Registro",
         component: () => import("src/pages/Register.vue"),
       },
       {
         path: "/usuario",
-        name: "usuario",
+        name: "Usuario",
         component: () => import("src/pages/Usuario.vue"),
       },
     ],
@@ -73,6 +73,8 @@ const routes = [
     path: "/:catchAll(.*)*",
     component: () => import("pages/Error404.vue"),
   },
+
+  
 ];
 
 export default routes;

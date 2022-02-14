@@ -17,6 +17,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+
 export default {
   setup() {
     const store = inject("store");
@@ -40,16 +41,19 @@ export default {
         },
       ],
       rows: [],
-      jwt:store.state.jwt
+      jwt: store.state.jwt,
     });
 
     onMounted(() => {
-      console.log("jwt",data.jwt);
-         axios
+      sendGetRequest();
+    });
+
+    const sendGetRequest = async () => {
+      try {
+        const resp = await axios
           .get("http://localhost:1337/api/servicios", {
             headers: {
-              Authorization:
-                "Bearer "+data.jwt,
+              Authorization: "Bearer " + store.state.jwt,
             },
           })
           .then(function (response) {
@@ -64,13 +68,15 @@ export default {
           .catch(function (error) {
             console.log(error);
           });
-
-          
-      
-    });
+      } catch (err) {
+        // Handle Error Here
+        console.log(err);
+      }
+    };
 
     return {
       data,
+      sendGetRequest,
     };
   },
 };

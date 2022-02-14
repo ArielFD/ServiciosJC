@@ -17,6 +17,7 @@ const state = reactive({
   ],
   ageRules:[],
   passRules:[],
+  
 });
 
 const methods = {

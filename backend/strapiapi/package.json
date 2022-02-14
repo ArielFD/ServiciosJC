@@ -16,6 +16,7 @@
     "@strapi/provider-email-sendgrid": "^4.0.6",
     "@strapi/strapi": "4.0.6",
     "axios": "^0.25.0",
+    "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "nodemailer": "^6.7.2",
     "pg": "8.6.0",
@@ -31,6 +32,5 @@
     "npm": ">=6.0.0"
   },
   "license": "MIT",
-  "main": "index.js",
-  "devDependencies": {}
+  "main": "index.js"
 }

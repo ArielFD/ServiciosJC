@@ -2,7 +2,8 @@ const axios = require('axios');
 var nodemailer =require("nodemailer")
 express=require("express")
 var app=express();
-
+require('dotenv').config()
+console.log("Procces".process.env)
 //===================================================================Send Email===================================================================
 
 // app.post("/send-email",(req,res)=>{
@@ -97,5 +98,3 @@ app.listen(3000,()=>{
   // .catch(error => {
   //   console.error('An error occurred:', error.response);
   // });
-
-  console.log(strapi.query('user', 'users-permissions').find());

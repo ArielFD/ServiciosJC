@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>{{ $route.name }}</h5>
+    <h5>LOGIN</h5>
     <form @submit.prevent.stop="onSubmit" class="q-gutter-md">
     <q-input
       ref="emailRef"
@@ -87,7 +87,7 @@ export default {
         })
         .then(function (response) {
           console.log(response);
-          store.state.alerts[1].message="Sesion Iniciada!"
+          store.state.alerts[1].message="Sesion Iniciada, Bienvenido!!!"
           $q.notify(store.state.alerts[1])
           store.state.jwt = response.data.jwt;
           console.log(store.state.jwt);
@@ -95,7 +95,7 @@ export default {
         })
         .catch(function (error) {
           console.log(error.response);
-          store.state.alerts[0].message="Error al Inciciar Sesion!"
+          store.state.alerts[0].message="Credenciales incorrectas"
           $q.notify(store.state.alerts[0])
         });
     }

@@ -118,6 +118,7 @@ import { Dialog } from "quasar";
 
 export default {
   setup() {
+    const store = inject("store");
     const selected = ref([]);
     let data = reactive({
       columns: [
@@ -298,6 +299,7 @@ export default {
     }
 
     return {
+      store,
       data,
       selected,
       getSelectedString,

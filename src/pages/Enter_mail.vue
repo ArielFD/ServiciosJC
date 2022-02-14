@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>ENTER MAIL PLEASE</h5>
+    <h5>INGRESE EMAIL PORFAVOR</h5>
     <q-input v-model="data.email" type="email" prefix="Email:">
       <template v-slot:prepend>
         <q-icon name="mail" />

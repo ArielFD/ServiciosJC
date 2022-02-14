@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>USUARIO</h5>
+    <h5>{{ $route.name }}</h5>
     <q-table
       title="Servicios"
       dense

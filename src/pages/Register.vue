@@ -1,42 +1,47 @@
 <template>
   <q-page>
     <h5>REGISTER</h5>
-    <q-input v-model="data.username" label="Nombre de Usuario" />
-    <q-input
-      v-model="data.email"
-      type="email"
-      prefix="Email:"
-      @keyup.enter="register"
-    >
-      <template v-slot:prepend>
-        <q-icon name="mail" />
-      </template>
-    </q-input>
-    <q-input
-      class="q-mt-md"
-      v-model="data.password"
-      prefix="Password:"
-      filled
-      :type="data.isPwd ? 'password' : 'text'"
-      @keyup.enter="register"
-    >
-      <template v-slot:append>
-        <q-icon
-          :name="data.isPwd ? 'visibility_off' : 'visibility'"
-          class="cursor-pointer"
-          @click="data.isPwd = !data.isPwd"
+    <form @submit.prevent.stop="onSubmit" class="q-gutter-md">
+      <q-input v-model="data.username" label="Nombre de Usuario" />
+      <q-input
+        ref="emailRef"
+        v-model="data.email"
+        type="email"
+        prefix="Email:"
+        @keyup.enter="register"
+        lazy-rules
+        :rules="store.state.emailRules"
+      >
+        <template v-slot:prepend>
+          <q-icon name="mail" />
+        </template>
+      </q-input>
+      <q-input
+        class="q-mt-md"
+        v-model="data.password"
+        prefix="Password:"
+        filled
+        :type="data.isPwd ? 'password' : 'text'"
+        @keyup.enter="register"
+      >
+        <template v-slot:append>
+          <q-icon
+            :name="data.isPwd ? 'visibility_off' : 'visibility'"
+            class="cursor-pointer"
+            @click="data.isPwd = !data.isPwd"
+          />
+        </template>
+      </q-input>
+      <div class="row-4 q-pa-md">
+        <q-btn
+          color="primary"
+          label="Create Acount"
+          class="col q-ma-sm"
+          @click="register"
         />
-      </template>
-    </q-input>
-    <div class="row-4 q-pa-md">
-      <q-btn
-        color="primary"
-        label="Create Acount"
-        class="col q-ma-sm"
-        @click="register"
-      />
-      <q-btn color="primary" label="Cancelar" class="col q-ma-sm" to="/" />
-    </div>
+        <q-btn color="primary" label="Cancelar" class="col q-ma-sm" to="/" />
+      </div>
+    </form>
   </q-page>
 </template>
 
@@ -48,6 +53,7 @@ import { useQuasar } from "quasar";
 
 export default {
   setup() {
+    const store = inject("store");
     const router = useRouter();
     const route = useRoute();
     const $q = useQuasar();
@@ -74,7 +80,7 @@ export default {
             })
             .then((response) => {
               console.log("Your user received an email");
-              store.state.alerts[0].message =
+              store.state.alerts[1].message =
                 "Se le ha enviado un email de confirmacion!";
               $q.notify(store.state.alerts[1]);
               router.push("/");
@@ -93,9 +99,29 @@ export default {
         });
     }
 
+    function onSubmit() {
+      // if (data.nameRef="") {
+      //   // form has error
+      //   $q.notify({
+      //     icon: 'done',
+      //     color: 'positive',
+      //     message: 'Submitted'
+      //   })
+      // }
+      // else {
+      //   $q.notify({
+      //     icon: 'done',
+      //     color: 'positive',
+      //     message: 'Submitted'
+      //   })
+      // }
+    }
+
     return {
+      store,
       data,
       register,
+      onSubmit,
     };
   },
 };

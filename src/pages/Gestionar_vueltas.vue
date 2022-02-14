@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>{{ data.star }}</h5>
+    <h5>{{ $route.name }}</h5>
     <div class="row">
       <q-input
         v-model="data.star"
@@ -77,8 +77,8 @@
       />
     </div>
     <div class="row q-pa-md">
-      <q-btn color="primary" label="Aceptar" class="col q-ma-md" />
-      <q-btn color="primary" label="Cancelar" class="col q-ma-md" />
+      <q-btn color="primary" label="Aceptar" class="col q-ma-md" @click="getDates(data.star,data.end)"/>
+      <q-btn color="primary" label="Cancelar" class="col q-ma-md" @click="resetSearch"/>
     </div>
   </q-page>
 </template>
@@ -91,6 +91,7 @@ import moment from "moment";
 
 export default {
   setup() {
+    const store = inject("store");
     const selected = ref([]);
     let data = reactive({
       columns: [
@@ -158,6 +159,7 @@ export default {
               category: "breakfast",
             });
           }
+          console.log(data.rows);
         })
         .catch(function (error) {
           console.log(error);
@@ -174,18 +176,28 @@ export default {
     });
 
     function getDates(startDate, stopDate) {
-      var dateArray = data.rows;
+      // var dateArray = data.rows;
+      console.log(data.rows);
       var currentDate = moment(startDate).format("DD-MM-YYYY");
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
-      dateArray.forEach((element) => {
+      console.log("asd",startDate);
+      data.rows.forEach((element) => {
         if (
-          moment(element.name).format("DD-MM-YYYY") >= currentDate &&
-          moment(element.name).format("DD-MM-YYYY") <= stopDate
+          moment(element.name).format("MM-DD-YYYY") >= currentDate &&
+          moment(element.name).format("MM-DD-YYYY") <= stopDate
         ) {
           console.log("true");
+          element.category ="breakfast"
         } else {
-          element.category = "";
+          element.category ="";
         }
+        
+      });
+    }
+
+    function resetSearch(){
+      data.rows.forEach(element => {
+        element.category="breakfast"
       });
     }
 
@@ -308,6 +320,7 @@ export default {
     }
 
     return {
+      store,
       data,
       selected,
       getSelectedString,
@@ -316,6 +329,7 @@ export default {
       customFilter,
       filter,
       getDates,
+      resetSearch
     };
   },
 };

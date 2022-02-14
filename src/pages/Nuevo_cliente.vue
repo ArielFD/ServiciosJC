@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>CAJERO</h5>
+    <h5>{{ $route.name }}</h5>
     <q-input v-model="text" label="Nombre" />
     <q-input v-model="text" label="Apellidos" />
     <q-input v-model="text" label="CI" />

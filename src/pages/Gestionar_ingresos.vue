@@ -46,7 +46,7 @@
     <q-field filled >
       <template v-slot:control>
         <div class="self-center full-width no-outline text-center text-h4 text-weight-bolder" tabindex="0">
-          Ariel Ferrera
+          {{data.total}}
         </div>
       </template>
     </q-field>
@@ -56,9 +56,9 @@
         color="primary"
         label="Aceptar"
         class="col q-ma-md"
-        @click="getDates"
+        @click="getDates(data.star,data.end)"
       />
-      <q-btn color="primary" label="Cancelar" class="col q-ma-md" />
+      <q-btn color="primary" label="Cancelar" class="col q-ma-md" @click="resetSearch" />
     </div>
   </q-page>
 </template>
@@ -72,6 +72,7 @@ import { Dialog } from "quasar";
 
 export default {
   setup() {
+    const store = inject("store");
     const selected = ref([]);
     let data = reactive({
       columns: [
@@ -113,6 +114,7 @@ export default {
       filterToggle: {
         breakfast: true,
       },
+      total:0
     });
 
     onMounted(() => {
@@ -156,15 +158,21 @@ export default {
       var dateArray = data.rows;
       var currentDate = moment(startDate).format("DD-MM-YYYY");
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
-      dateArray.forEach((element) => {
+      data.rows.forEach((element) => {
         if (
-          moment(element.name).format("DD-MM-YYYY") >= currentDate &&
-          moment(element.name).format("DD-MM-YYYY") <= stopDate
+          moment(element.name).format("MM-DD-YYYY") >= currentDate &&
+          moment(element.name).format("MM-DD-YYYY") <= stopDate
         ) {
-          console.log("true");
+          element.category="breakfast"
         } else {
           element.category = "";
         }
+      });
+    }
+
+    function resetSearch(){
+      data.rows.forEach(element => {
+        element.category="breakfast"
       });
     }
 
@@ -221,16 +229,18 @@ export default {
         : `${selected.value.length} record${
             selected.value.length > 1 ? "s" : ""
           } selected of ${data.rows.length}`;
-      log;
+      
     }
 
     return {
+      store,
       data,
       selected,
       getSelectedString,
       customFilter,
       filter,
       getDates,
+      resetSearch
     };
   },
 };

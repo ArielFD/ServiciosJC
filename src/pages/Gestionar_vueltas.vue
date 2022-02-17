@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <h5>{{ $route.name }}</h5>
-    <div class="row">
+    <div class="row ">
       <q-input
         v-model="data.star"
         filled
@@ -16,6 +16,10 @@
         hint="Hasta"
         class="col q-pa-xs q-mb-sm"
       />
+      <div class="q-pa-md q-gutter-sm">
+      <q-btn flat round color="primary" icon="search" @click="getDates(data.star,data.end)"/>
+      <q-btn flat round color="primary" icon="cached" @click="resetSearch"/>
+      </div>
     </div>
     <q-table
       title="Ingresos"
@@ -42,43 +46,29 @@
         </div>
       </template>
     </q-table>
-    <div class="row q-pa-md">
-      <q-btn
-        color="primary"
-        label="+"
-        class="col-2 q-ma-md"
-        @click="data.cantVueltas++"
-      />
-      <q-btn
-        color="primary"
-        label="-"
-        class="col-2 q-ma-md"
-        @click="data.cantVueltas--"
-      />
+    <div class="row justify-center">
       <q-input
         v-model.number="data.cantVueltas"
         type="number"
         filled
-        class="col-2 q-ma-md"
+        class="col-6 q-ma-md"
+        item-aligned
+        :input-style="{ fontSize: '40px', textAlign:'center' }"
       />
     </div>
-    <div class="row q-pa-md">
+    <div class="row">
       <q-btn
-        color="positive"
+        color="primary"
         label="Retirar"
         class="col q-ma-md"
         @click="disminuirSaldo"
       />
       <q-btn
-        color="positive"
+        color="primary"
         label="Ingresar"
         class="col q-ma-md"
         @click="aumentarSaldo"
       />
-    </div>
-    <div class="row q-pa-md">
-      <q-btn color="primary" label="Aceptar" class="col q-ma-md" @click="getDates(data.star,data.end)"/>
-      <q-btn color="primary" label="Cancelar" class="col q-ma-md" @click="resetSearch"/>
     </div>
   </q-page>
 </template>

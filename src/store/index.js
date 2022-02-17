@@ -17,7 +17,38 @@ const state = reactive({
   ],
   ageRules:[],
   passRules:[],
-  
+  linksListAdmin : [
+    {
+      title: "Editar Informacion",
+      caption: "Editar Informacion",
+      icon: "settings",
+      link: "/editarinf",
+    },
+    {
+      title: "Gestionar vueltas",
+      caption: "Gestionar vueltas",
+      icon: "cached",
+      link: "/Gestionar_Vueltas",
+    },
+    {
+      title: "Gestionar Ingresos",
+      caption: "Gestionar Ingresos",
+      icon: "paid",
+      link: "/Gestionar_Ingresos",
+    },
+    {
+      title: "Gestionar Roles",
+      caption: "Gestionar Roles",
+      icon: "supervisor_account",
+      link: "/Gestionar_Roles",
+    },
+    {
+      title: "Gestionar Clientes",
+      caption: "Gestionar Clientes",
+      icon: "group_add",
+      link: "/Gestionar_Usuarios",
+    },
+  ]
 });
 
 const methods = {

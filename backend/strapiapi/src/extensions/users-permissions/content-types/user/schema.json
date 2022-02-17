@@ -62,6 +62,24 @@
       "target": "plugin::users-permissions.role",
       "inversedBy": "users",
       "configurable": false
+    },
+    "Nombre": {
+      "type": "string"
+    },
+    "Apellidos": {
+      "type": "string"
+    },
+    "NoIdentidad": {
+      "type": "biginteger"
+    },
+    "Telefono": {
+      "type": "biginteger"
+    },
+    "DireccionParticular": {
+      "type": "text"
+    },
+    "NoSolapin": {
+      "type": "biginteger"
     }
   }
 }

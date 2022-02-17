@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>INGRESE EMAIL PORFAVOR</h5>
+    <h5>INGRESE EMAIL POR FAVOR</h5>
     <q-input v-model="data.email" type="email" prefix="Email:">
       <template v-slot:prepend>
         <q-icon name="mail" />
@@ -14,14 +14,17 @@
 </template>
 
 <script>
-import { defineComponent, ref, reactive } from "vue";
+import { defineComponent, ref, reactive,inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
+import { useQuasar } from 'quasar'
 
 export default {
   setup() {
     const router = useRouter();
     const route = useRoute();
+    const store = inject("store");
+    const $q = useQuasar() 
 
     let data = reactive({
       email: "",
@@ -36,7 +39,6 @@ export default {
           console.log("Your user received an email");
           store.state.alerts[1].message="Enviado email de confirmacion!"
           $q.notify(store.state.alerts[1])
-          router.push("/entercode");
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);

@@ -28,58 +28,50 @@
     </q-table>
     <div class="row q-pa-md">
       <q-btn
-        color="positive"
-        label="Create"
+        color="primary"
+        label="Crear"
         class="col q-ma-md"
-        @click="Create"
+        @click="data.cardCreate=true"
       />
-      <q-btn
-        label="Card"
-        color="positive"
-        @click="data.card = true"
-        class="col q-ma-md"
-      />
-      <q-dialog v-model="data.card">
+      <q-dialog v-model="data.cardCreate">
         <q-card class="my-card">
           <q-card-section>
-          <div class="text-h6">Edit</div>
-        </q-card-section>
-        
+            <div class="text-h6">Crear Rol</div>
+          </q-card-section>
+
           <q-card-section>
-            <q-input v-model="data.username" label="Nombre de Usuario" />
-            <q-input
-              v-model="data.email"
-              type="email"
-              prefix="Email:"
-              @keyup.enter="Edit"
-            >
-              <template v-slot:prepend>
-                <q-icon name="mail" />
-              </template>
-            </q-input>
-            <q-input
-              class="q-mt-md"
-              v-model="data.password"
-              prefix="Password:"
-              filled
-              :type="data.isPwd ? 'password' : 'text'"
-              @keyup.enter="Edit"
-            >
-              <template v-slot:append>
-                <q-icon
-                  :name="data.isPwd ? 'visibility_off' : 'visibility'"
-                  class="cursor-pointer"
-                  @click="data.isPwd = !data.isPwd"
-                />
-              </template>
-            </q-input>
-            <q-checkbox
-              left-label
-              v-model="data.confirmed"
-              label="Confirmed?"
-              checked-icon="task_alt"
-              unchecked-icon="highlight_off"
+            <q-input v-model="data.nameRol" label="Nombre del Rol" class="my-input"/>
+            <q-input v-model="data.descriptionRol"  label="Descripcion del Rol" autogrow />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn
+              v-close-popup
+              flat
+              color="primary"
+              label="Crear"
+              @click="Create"
             />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <q-btn
+        label="Editar"
+        color="primary"
+        @click="editFields"
+        class="col q-ma-md"
+      />
+      <q-dialog v-model="data.cardEdit">
+        <q-card class="my-card">
+          <q-card-section>
+            <div class="text-h6">Editar Rol</div>
+          </q-card-section>
+
+          <q-card-section>
+            <q-input v-model="data.nameRolEdit" label="Nombre del Rol" class="my-input"/>
+            <q-input v-model="data.descriptionRolEdit"  label="Descripcion del Rol" autogrow />
           </q-card-section>
 
           <q-separator />
@@ -97,15 +89,11 @@
       </q-dialog>
 
       <q-btn
-        color="positive"
-        label="Delete"
+        color="primary"
+        label="Eliminar"
         class="col q-ma-md"
         @click="Delete"
       />
-    </div>
-    <div class="row q-pa-md">
-      <q-btn color="primary" label="Aceptar" class="col q-ma-md" />
-      <q-btn color="primary" label="Cancelar" class="col q-ma-md" />
     </div>
   </q-page>
 </template>
@@ -140,15 +128,13 @@ export default {
         },
       ],
       rows: [],
-      star: "",
-      end: "",
-      search: "",
-      password: "",
-      email: "",
-      username: "",
-      nameRol:"asdfg",
-      description:"asdfg",
-      card: false,
+      search:"",
+      nameRol: "",
+      descriptionRol: "",
+      nameRolEdit:"",
+      descriptionRolEdit:"",
+      cardCreate: false,
+      cardEdit: false,
       isPwd: false,
       confirmed: false,
       filterToggle: {
@@ -160,9 +146,8 @@ export default {
       axios
         .get("http://localhost:1337/api/users-permissions/roles", {
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-              },
+            Authorization: "Bearer " + store.state.jwt,
+          },
         })
         .then(function (response) {
           console.log(response.data.roles[0].description);
@@ -181,18 +166,31 @@ export default {
         });
     });
 
+    function editFields(params) {
+      data.nameRolEdit=selected.value[0].name,
+      data.descriptionRolEdit=selected.value[0].Descripcion,
+      data.cardEdit=true
+    }
+
     function Create() {
       axios
         .post("http://localhost:1337/api/users-permissions/roles", {
           name: data.nameRol,
-          description: data.description,
+          description: data.descriptionRol,
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-              },
+            Authorization: "Bearer " + store.state.jwt,
+          },
         })
         .then(function (response) {
           console.log(response);
+          data.rows.push(
+            {
+              name: data.nameRol,
+              Descripcion: data.descriptionRol,
+              id: "",
+              category: "breakfast",
+            }
+          )
         })
         .catch(function (error) {
           console.log(error);
@@ -201,12 +199,14 @@ export default {
 
     function Delete(params) {
       axios
-        .delete(`http://localhost:1337/api/users-permissions/roles/${selected.value[0].id}`, {
-          headers: {
-            Authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTY0NDQyNDQzNSwiZXhwIjoxNjQ3MDE2NDM1fQ.KcdGFK94K-7Hhh6XNhvTbk1jPZ0rlE_vOFdXis-9vps",
-          },
-        })
+        .delete(
+          `http://localhost:1337/api/users-permissions/roles/${selected.value[0].id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + store.state.jwt,
+            },
+          }
+        )
         .then(function (response) {
           console.log(response);
         })
@@ -217,16 +217,20 @@ export default {
 
     function Edit(params) {
       axios
-        .put(`http://localhost:1337/api/users-permissions/roles/${selected.value[0].id}`, {
-          headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-              },
-          name: data.nameRol,
-          description: data.description,
-        })
+        .put(
+          `http://localhost:1337/api/users-permissions/roles/${selected.value[0].id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + store.state.jwt,
+            },
+            name: data.nameRolEdit,
+            description: data.descriptionRolEdit,
+          }
+        )
         .then(function (response) {
           console.log(response);
+          selected.value[0].name=data.nameRolEdit
+          selected.value[0].Descripcion=data.descriptionRolEdit
         })
         .catch(function (error) {
           console.log(error);
@@ -308,10 +312,18 @@ export default {
       Create,
       Delete,
       Edit,
+      editFields
     };
   },
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+.my-card
+  width: 100%
+  max-width: 500px
+
+.my-input
+  width: 100%
+  max-width: 200px
 </style>

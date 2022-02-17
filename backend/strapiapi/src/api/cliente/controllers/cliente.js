@@ -56,22 +56,22 @@ module.exports = createCoreController('api::cliente.cliente'
 //     return strapi.query('plugin::users-permissions.user').findMany({ where: params, populate: ['role'] });
 //   },
 
-// async find(ctx, next, { populate } = {}) {
-//     console.log("fetchAll");
-//     const users = await strapi.service('api::cliente.cliente').fetchAll(ctx.query.filters, populate);
-//     console.log("Usuario",users);
-//     ctx.body = users
-//     //await Promise.all(users.map(user => sanitizeOutput(user, ctx)));
-//   }
+async find(ctx, next, { populate } = {}) {
+    console.log("fetchAll");
+    const users = await strapi.service('api::cliente.cliente').fetchAll(ctx.query.filters, populate);
+    console.log("Usuario",users);
+    ctx.body = users
+    //await Promise.all(users.map(user => sanitizeOutput(user, ctx)));
+  }
 
-async find(ctx) {
-    const user = ctx.state.user;
-    if (!user) {
-      return ctx.unauthorized();
-    }
+// async find(ctx) {
+//     const user = ctx.state.user;
+//     if (!user) {
+//       return ctx.unauthorized();
+//     }
 
-    ctx.body = user
-    //await sanitizeOutput(user, ctx);
-  },
+//     ctx.body = user
+//     //await sanitizeOutput(user, ctx);
+//   },
 })
 );

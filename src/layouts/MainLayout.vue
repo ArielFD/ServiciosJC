@@ -22,7 +22,7 @@
         <q-item-label header> Preferencias </q-item-label>
 
         <EssentialLink
-          v-for="link in essentialLinks"
+          v-for="link in data.linkslist"
           :key="link.title"
           v-bind="link"
         />
@@ -46,31 +46,31 @@ const linksListAdmin = [
     title: "Editar Informacion",
     caption: "Editar Informacion",
     icon: "settings",
-    link: "/editInf",
+    link: "/editarinf",
   },
   {
     title: "Gestionar vueltas",
     caption: "Gestionar vueltas",
     icon: "cached",
-    link: "/editInf",
+    link: "/gestionarvueltas",
   },
   {
     title: "Gestionar Ingresos",
     caption: "Gestionar Ingresos",
     icon: "paid",
-    link: "/editInf",
+    link: "/gestionaringresos",
   },
   {
     title: "Gestionar Roles",
     caption: "Gestionar Roles",
     icon: "supervisor_account",
-    link: "/editInf",
+    link: "/gestionarrol",
   },
   {
-    title: "Gestionar Clientes",
-    caption: "Gestionar Clientes",
+    title: "Gestionar Usuarios",
+    caption: "Gestionar Usuarios",
     icon: "group_add",
-    link: "/editInf",
+    link: "/gestionarusuarios",
   },
 ];
 
@@ -79,13 +79,13 @@ const linksListAuth = [
     title: "Editar Informacion",
     caption: "Editar Informacion",
     icon: "settings",
-    link: "/editInf",
+    link: "/editarinf",
   },
   {
     title: "Gestionar vueltas",
     caption: "Gestionar vueltas",
     icon: "cached",
-    link: "/editInf",
+    link: "/Gestionar_Vueltas",
   },
 ];
 
@@ -118,11 +118,65 @@ export default defineComponent({
       jwt: store.state.jwt,
     });
     // + store.state.jwt,
-    onMounted(() => {});
+    onMounted(() => {
+      console.log("mounted");
+    });
+    onUpdated(() => {
+      console.log("update");
+      console.log(router.currentRoute.value.path);
+      axios
+        .get("http://localhost:1337/api/clientes", {
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          console.log("respuesta",response);
+          if (response.data.role.id === 3 && router.currentRoute.value.matched[1].path!="/") {
+            console.log("id1",router.currentRoute.value);
+            linksListAdmin.forEach((element) => {
+              data.linkslist.unshift({
+                title: element.title,
+                caption: element.caption,
+                icon: element.icon,
+                link: element.link,
+              });
+            });
+            if (data.linkslist.length > 6) data.linkslist.splice(0, 5);
+          } else if (response.data.role.id === 1 && router.currentRoute.value.matched[1].path!=="/") {
+            console.log("id2",response.data.role.id);
+            linksListAuth.forEach((element) => {
+              data.linkslist.unshift({
+                title: element.title,
+                caption: element.caption,
+                icon: element.icon,
+                link: element.link,
+              });
+            });
+            if (data.linkslist.length > 3) data.linkslist.splice(0, 2);
+          } else if (router.currentRoute.value.matched[1].path == "/") {
+            data.linkslist.splice(0, data.linkslist.length-1);
+            
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    });
+    onUnmounted(() => {
+      console.log("unmounted");
+    });
+    // let filter = computed(() => {
+    //   return {
+    //     list:data.linkslist
+    //     // lunch: data.filterToggle.lunch,
+    //     // dinner: data.filterToggle.dinner,
+    //   };
+    // });
 
-    const interval = setInterval(function () {
-      sendGetRequest();
-    }, 5000);
+    // const interval = setInterval(function () {
+    //   sendGetRequest();
+    // }, 100000);
 
     const sendGetRequest = async () => {
       try {
@@ -164,6 +218,11 @@ export default defineComponent({
         console.log(err);
       }
     };
+
+    watch(data.jwt, (newValue) => {
+      console.log("newValue", newValue);
+      sendGetRequest;
+    });
 
     return {
       data,

@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>Usuarios</h5>
+    <h5>Usuarios{{ selected }}</h5>
     <q-table
       title="Ingresos"
       dense
@@ -28,42 +28,43 @@
     </q-table>
     <div class="row q-pa-md">
       <q-btn
-        color="positive"
-        label="Create"
+        color="primary"
+        label="Crear"
         class="col q-ma-md"
-        @click="Create"
+        @click="data.cardCreate = true"
       />
-      <q-btn
-        label="Card"
-        color="positive"
-        @click="data.card = true"
-        class="col q-ma-md"
-      />
-      <q-dialog v-model="data.card">
+      <q-dialog v-model="data.cardCreate">
         <q-card class="my-card">
           <q-card-section>
-            <div class="text-h6">Edit</div>
+            <div class="text-h6">Nuevo Usuario</div>
           </q-card-section>
 
-          <q-card-section>
-            <q-input v-model="data.username" label="Nombre de Usuario" />
+          <q-card-section class="q-pa-sm">
             <q-input
-              v-model="data.email"
-              type="email"
-              prefix="Email:"
-              @keyup.enter="Edit"
-            >
+              v-model="data.username"
+              label="Nombre de Usuario"
+              class="my-input"
+            />
+            <q-input v-model="data.nombre" label="Nombre" class="my-input" />
+            <q-input
+              v-model="data.apellidos"
+              label="Apellidos"
+              class="my-input"
+            />
+            <q-input v-model="data.email" label="Email">
               <template v-slot:prepend>
                 <q-icon name="mail" />
               </template>
             </q-input>
             <q-input
-              class="q-mt-md"
+              ref="passRef"
+              class="q-mt-md my-input"
               v-model="data.password"
               prefix="Password:"
               filled
               :type="data.isPwd ? 'password' : 'text'"
-              @keyup.enter="Edit"
+              lazy-rules
+              :rules="store.state.passRules"
             >
               <template v-slot:append>
                 <q-icon
@@ -73,13 +74,84 @@
                 />
               </template>
             </q-input>
-            <q-checkbox
-              left-label
-              v-model="data.confirmed"
-              label="Confirmed?"
-              checked-icon="task_alt"
-              unchecked-icon="highlight_off"
+            <q-input
+              v-model="data.ci"
+              label="Carnet Identidad"
+              class="my-input"
             />
+            <q-input
+              v-model="data.telefono"
+              label="Telefono"
+              class="my-input"
+            />
+            <q-input v-model="data.dirPart" label="Direccion Particular" />
+            <q-input
+              v-model="data.noSolapin"
+              label="No Solapin"
+              class="my-input"
+            />
+            <q-select filled v-model="data.rol" :options="data.options" label="Filled" />
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn
+              v-close-popup
+              flat
+              color="primary"
+              label="Crear"
+              @click="Create"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <q-btn
+        label="Editar"
+        color="primary"
+        @click="editFields"
+        class="col q-ma-md"
+      />
+      <q-dialog v-model="data.cardEdit">
+        <q-card class="my-card">
+          <q-card-section>
+            <div class="text-h6">Editar Usuario</div>
+          </q-card-section>
+
+          <q-card-section>
+            <q-input
+              v-model="data.usernameedit"
+              label="Nombre de Usuario"
+              class="my-input"
+            />
+            <q-input v-model="data.nombreedit" label="Nombre" class="my-input" />
+            <q-input
+              v-model="data.apellidosedit"
+              label="Apellidos"
+              class="my-input"
+            />
+            <q-input v-model="data.emailedit" label="Email">
+              <template v-slot:prepend>
+                <q-icon name="mail" />
+              </template>
+            </q-input>
+            <q-input
+              v-model="data.ciedit"
+              label="Carnet Identidad"
+              class="my-input"
+            />
+            <q-input
+              v-model="data.telefonoedit"
+              label="Telefono"
+              class="my-input"
+            />
+            <q-input v-model="data.dirPartedit" label="Direccion Particular" />
+            <q-input
+              v-model="data.noSolapinedit"
+              label="No Solapin"
+              class="my-input"
+            />
+            <q-select filled v-model="data.roledit" :options="data.options" label="Filled" />
           </q-card-section>
 
           <q-separator />
@@ -97,15 +169,11 @@
       </q-dialog>
 
       <q-btn
-        color="positive"
+        color="primary"
         label="Delete"
         class="col q-ma-md"
         @click="Delete"
       />
-    </div>
-    <div class="row q-pa-md">
-      <q-btn color="primary" label="Aceptar" class="col q-ma-md" />
-      <q-btn color="primary" label="Cancelar" class="col q-ma-md" />
     </div>
   </q-page>
 </template>
@@ -138,17 +206,85 @@ export default {
           field: "email",
           sortable: true,
         },
+        {
+          name: "name",
+          align: "center",
+          label: "Name",
+          field: "name",
+          sortable: true,
+        },
+        {
+          name: "apellidos",
+          align: "center",
+          label: "Apellidos",
+          field: "apellidos",
+          sortable: true,
+        },
+        {
+          name: "CI",
+          align: "center",
+          label: "CI",
+          field: "CI",
+          sortable: true,
+        },
+        {
+          name: "Telefono",
+          align: "center",
+          label: "Telefono",
+          field: "Telefono",
+          sortable: true,
+        },
+        {
+          name: "DirPart",
+          align: "center",
+          label: "DirPart",
+          field: "DirPart",
+          sortable: true,
+        },
+        {
+          name: "NoSolapin",
+          align: "center",
+          label: "NoSolapin",
+          field: "NoSolapin",
+          sortable: true,
+        },
+        {
+          name: "Rol",
+          align: "center",
+          label: "Rol",
+          field: "Rol",
+          sortable: true,
+        },
       ],
       rows: [],
-      star: "",
-      end: "",
       search: "",
       password: "",
       email: "",
       username: "",
-      card: false,
-      isPwd: false,
-      confirmed: false,
+      nombre: "",
+      apellidos: "",
+      ci: "",
+      telefono: "",
+      dirPart: "",
+      noSolapin: "",
+      rol: "",
+      rolId:"",
+      options:["Autenticado","Public","Administrador"],
+      emailedit: "",
+      passwordedit: "",
+      usernameedit: "",
+      nombreedit: "",
+      apellidosedit: "",
+      ciedit: "",
+      telefonoedit: "",
+      dirPartedit: "",
+      noSolapinedit: "",
+      roledit: "",
+      rolIdedit:"",
+      cardEdit: false,
+      cardCreate: false,
+      isPwd: true,
+      confirmed: true,
       filterToggle: {
         breakfast: true,
       },
@@ -156,20 +292,29 @@ export default {
 
     onMounted(() => {
       axios
-        .get("http://localhost:1337/api/users", {
+        .get("http://localhost:1337/api/clientes", {
           headers: {
             Authorization:
               "Bearer "+store.state.jwt,
-              },
+          },
         })
         .then(function (response) {
+          console.log(response);
           for (let i = 0; i < response.data.length; i++) {
             data.rows.push({
               name: response.data[i].username,
               email: response.data[i].email,
+              nombre: response.data[i].Nombre,
+              apellidos: response.data[i].Apellidos,
+              CI: response.data[i].NoIdentidad,
+              Telefono: response.data[i].Telefono,
+              DirPart: response.data[i].DireccionParticular,
+              NoSolapin: response.data[i].NoSolapin,
+              Rol: response.data[i].role.name,
               id: response.data[i].id,
               category: "breakfast",
             });
+            console.log(data.rows);
           }
         })
         .catch(function (error) {
@@ -177,23 +322,69 @@ export default {
         });
     });
 
+    function editFields(params) {
+      (data.emailedit = selected.value[0].email),
+        (data.usernameedit = selected.value[0].name),
+        (data.nombreedit = selected.value[0].nombre),
+        (data.apellidosedit = selected.value[0].apellidos),
+        (data.ciedit = selected.value[0].CI),
+        (data.telefonoedit = selected.value[0].Telefono),
+        (data.dirPartedit = selected.value[0].DirPart),
+        (data.roledit = selected.value[0].Rol),
+        (data.noSolapinedit = selected.value[0].NoSolapin),
+        (data.cardEdit = true);
+    }
+
     function Create() {
+      if(data.rol=="Public"){
+        data.rolId="2"
+      }
+      if(data.rol=="Autenticado"){
+        data.rolId="1"
+      }
+      if(data.rol=="Administrador"){
+        data.rolId="3"
+      }
       axios
         .post("http://localhost:1337/api/users", {
           email: data.email,
           username: data.username,
           password: data.password,
           confirmed: data.confirmed,
+          Nombre: data.nombre,
+          Apellidos: data.apellidos,
+          NoIdentidad: data.ci,
+          Telefono: data.telefono,
+          DireccionParticular: data.dirPart,
+          NoSolapin: data.noSolapin,
+          role: {
+            id: data.rolId,
+          },
           headers: {
             Authorization:
               "Bearer "+store.state.jwt,
-              },
+          },
         })
         .then(function (response) {
           console.log(response);
+          data.rows.push(
+            {
+              name: data.username,
+              email: data.email,
+              nombre: data.nombre,
+              apellidos: data.apellidos,
+              CI: data.ci,
+              Telefono: data.telefono,
+              DirPart: data.dirPart,
+              NoSolapin: data.noSolapin,
+              Rol: data.rol,
+              id: "",
+              category: "breakfast",
+            }
+          )
         })
         .catch(function (error) {
-          console.log(error);
+          console.log(error.response);
         });
     }
 
@@ -201,9 +392,8 @@ export default {
       axios
         .delete(`http://localhost:1337/api/users/${selected.value[0].id}`, {
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-              },
+            Authorization: "Bearer " + store.state.jwt,
+          },
         })
         .then(function (response) {
           console.log(response);
@@ -214,25 +404,47 @@ export default {
     }
 
     function Edit(params) {
+      if(data.roledit=="Public"){
+        data.rolIdedit="2"
+      }
+      if(data.roledit=="Autenticado"){
+        data.rolIdedit="1"
+      }
+      if(data.roledit=="Administrador"){
+        data.rolIdedit="3"
+      }
       axios
         .put(`http://localhost:1337/api/users/${selected.value[0].id}`, {
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-              },
-          email: data.email,
-          username: data.username,
-          password: data.password,
+            Authorization: "Bearer "+store.state.jwt,
+          },
+          email: data.emailedit,
+          username: data.usernameedit,
           confirmed: data.confirmed,
+          Nombre: data.nombreedit,
+          Apellidos: data.apellidosedit,
+          NoIdentidad: data.ciedit,
+          Telefono: data.telefonoedit,
+          DireccionParticular: data.dirPartedit,
+          NoSolapin: data.noSolapinedit,
           role: {
-            id: 5,
+            id: data.rolIdedit,
           },
         })
         .then(function (response) {
           console.log(response);
+          selected.value[0].name=data.usernameedit
+          selected.value[0].email=data.emailedit
+          selected.value[0].nombre=data.nombreedit
+          selected.value[0].apellidos=data.apellidosedit
+          selected.value[0].CI=data.ciedit
+          selected.value[0].Telefono=data.telefonoedit
+          selected.value[0].DirPart=data.dirPartedit
+          selected.value[0].NoSolapin=data.noSolapinedit
+          selected.value[0].Rol=data.roledit
         })
         .catch(function (error) {
-          console.log(error);
+          console.log(error.response);
         });
     }
 
@@ -311,10 +523,18 @@ export default {
       Create,
       Delete,
       Edit,
+      editFields,
     };
   },
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+.my-card
+  width: 100%
+  max-width: 500px
+
+.my-input
+  width: 100%
+  max-width: 200px
 </style>

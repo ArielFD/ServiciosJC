@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <h5>Usuarios</h5>
-    <div class="row">
+    <div class="row ">
       <q-input
         v-model="data.star"
         filled
@@ -16,6 +16,10 @@
         hint="Hasta"
         class="col q-pa-xs q-mb-sm"
       />
+      <div class="q-pa-md q-gutter-sm">
+      <q-btn flat round color="primary" icon="search" @click="getDates(data.star,data.end)"/>
+      <q-btn flat round color="primary" icon="cached" @click="resetSearch"/>
+      </div>
     </div>
     <q-table
       title="Rol"
@@ -45,27 +49,17 @@
 
     <q-field filled >
       <template v-slot:control>
-        <div class="self-center full-width no-outline text-center text-h4 text-weight-bolder" tabindex="0">
+        <div class="self-center full-width no-outline text-center text-h4 text-weight-bolder">
           {{data.total}}
         </div>
       </template>
     </q-field>
-
-    <div class="row q-pa-md">
-      <q-btn
-        color="primary"
-        label="Aceptar"
-        class="col q-ma-md"
-        @click="getDates(data.star,data.end)"
-      />
-      <q-btn color="primary" label="Cancelar" class="col q-ma-md" @click="resetSearch" />
-    </div>
   </q-page>
 </template>
 
 <script>
 import { onMounted, onUpdated, onUnmounted } from "vue";
-import { ref, inject, computed, reactive } from "vue";
+import { ref, inject, computed, reactive,watch } from "vue";
 import axios from "axios";
 import moment from "moment";
 import { Dialog } from "quasar";
@@ -127,6 +121,7 @@ export default {
         })
         .then(function (response) {
           for (let i = 0; i < response.data.data.length; i++) {
+            data.total+=response.data.data[i].attributes.Cantidad
             data.rows.push({
               name: response.data.data[i].attributes.Fecha.split("-")
                 .reverse()
@@ -153,6 +148,16 @@ export default {
         // dinner: data.filterToggle.dinner,
       };
     });
+
+    watch(data,(newValue) => {
+      console.log("newValue");
+      data.total=0
+      data.rows.forEach(element => {
+        if(element.category=="breakfast"){
+          data.total+=element.Cantidad
+        }
+      });
+    })
 
     function getDates(startDate, stopDate) {
       var dateArray = data.rows;

@@ -62,16 +62,16 @@ async find(ctx, next, { populate } = {}) {
     console.log("Usuario",users);
     ctx.body = users
     //await Promise.all(users.map(user => sanitizeOutput(user, ctx)));
-  }
+  },
 
-// async find(ctx) {
-//     const user = ctx.state.user;
-//     if (!user) {
-//       return ctx.unauthorized();
-//     }
+async findOne(ctx) {
+    const user = ctx.state.user;
+    if (!user) {
+      return ctx.unauthorized();
+    }
 
-//     ctx.body = user
-//     //await sanitizeOutput(user, ctx);
-//   },
+    ctx.body = user
+    //await sanitizeOutput(user, ctx);
+  },
 })
 );

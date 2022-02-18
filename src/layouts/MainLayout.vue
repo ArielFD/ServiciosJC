@@ -30,8 +30,11 @@
     </q-drawer>
 
     <q-page-container class="contenedor q-pa-md">
-      <div class="row justify-center q-mt-xl">
-        <q-avatar rounded color="primary" text-color="white">J</q-avatar>
+      <div class="row justify-center">
+        <q-img
+          src="~assets/JovenClubW.jpeg"
+          :ratio="16/9"
+        />
       </div>
       <router-view />
     </q-page-container>
@@ -125,7 +128,7 @@ export default defineComponent({
       console.log("update");
       console.log(router.currentRoute.value.path);
       axios
-        .get("http://localhost:1337/api/clientes", {
+        .get("http://localhost:1337/api/clientes/1", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },

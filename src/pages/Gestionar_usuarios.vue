@@ -90,7 +90,12 @@
               label="No Solapin"
               class="my-input"
             />
-            <q-select filled v-model="data.rol" :options="data.options" label="Filled" />
+            <q-select
+              filled
+              v-model="data.rol"
+              :options="data.option"
+              label="Rol"
+            />
           </q-card-section>
 
           <q-separator />
@@ -124,7 +129,11 @@
               label="Nombre de Usuario"
               class="my-input"
             />
-            <q-input v-model="data.nombreedit" label="Nombre" class="my-input" />
+            <q-input
+              v-model="data.nombreedit"
+              label="Nombre"
+              class="my-input"
+            />
             <q-input
               v-model="data.apellidosedit"
               label="Apellidos"
@@ -151,7 +160,12 @@
               label="No Solapin"
               class="my-input"
             />
-            <q-select filled v-model="data.roledit" :options="data.options" label="Filled" />
+            <q-select
+              filled
+              v-model="data.roledit"
+              :options="data.option"
+              label="Rol"
+            />
           </q-card-section>
 
           <q-separator />
@@ -161,8 +175,56 @@
               v-close-popup
               flat
               color="primary"
+              label="Cambiar Contraseña"
+              @click="sendMail"
+            />
+            <q-btn
+              v-close-popup
+              flat
+              color="primary"
               label="Edit"
               @click="Edit"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+
+      <q-dialog v-model="data.cardPass">
+        <q-card class="my-card">
+          <q-card-section>
+            <div class="text-h6">Cambiar Contraseña</div>
+          </q-card-section>
+
+          <q-card-section>
+            <q-input
+              ref="passRef"
+              class="q-mt-md my-input"
+              v-model="data.newPass"
+              prefix="Password:"
+              filled
+              :type="data.isPwd ? 'password' : 'text'"
+              lazy-rules
+              :rules="store.state.passRules"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="data.isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="data.isPwd = !data.isPwd"
+                />
+              </template>
+            </q-input>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn
+              v-close-popup
+              flat
+              color="primary"
+              label="Cambiar Contraseña"
+              @click="resetPass"
             />
           </q-card-actions>
         </q-card>
@@ -183,9 +245,11 @@ import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
 import { Dialog } from "quasar";
-
+import { useQuasar } from 'quasar'
+    
 export default {
   setup() {
+    const $q = useQuasar()        
     const store = inject("store");
     const selected = ref([]);
     let data = reactive({
@@ -258,6 +322,7 @@ export default {
       ],
       rows: [],
       search: "",
+
       password: "",
       email: "",
       username: "",
@@ -268,8 +333,11 @@ export default {
       dirPart: "",
       noSolapin: "",
       rol: "",
-      rolId:"",
-      options:["Autenticado","Public","Administrador"],
+      rolId: "",
+
+      options: [],
+      option: [],
+
       emailedit: "",
       passwordedit: "",
       usernameedit: "",
@@ -280,7 +348,11 @@ export default {
       dirPartedit: "",
       noSolapinedit: "",
       roledit: "",
-      rolIdedit:"",
+      rolIdedit: "",
+
+      newPass:"",
+      token:"",
+      cardPass:false,
       cardEdit: false,
       cardCreate: false,
       isPwd: true,
@@ -294,8 +366,7 @@ export default {
       axios
         .get("http://localhost:1337/api/clientes", {
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
+            Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
@@ -320,7 +391,83 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
+
+      axios
+        .get("http://localhost:1337/api/users-permissions/roles", {
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          response.data.roles.forEach((element) => {
+            data.option.push(element.name);
+            data.options.push({
+              name: element.name,
+              id: element.id,
+            });
+          });
+          console.log(data.options);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
+
+    async function sendMail() {
+      data.cardPass=true
+      console.log(data.emailedit);
+      await axios
+        .post("http://localhost:1337/api/auth/forgot-password", {
+          email: data.emailedit, // user's email
+        })
+        .then((response) => {
+          console.log("Your user received an email");
+          store.state.alerts[1].message="Enviado email de confirmacion!"
+          $q.notify(store.state.alerts[1])
+          axios
+        .get("http://localhost:1337/api/clientes", {
+          headers: {
+            Authorization:
+              "Bearer "+store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          console.log(response);
+          response.data.forEach(element => {
+            if(element.email===data.emailedit){
+              data.token=element.resetPasswordToken
+            }
+          });
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+        })
+        .catch((error) => {
+          console.log("An error occurred:", error.response);
+          store.state.alerts[0].message="Error con el envio de emai de confirmacion!"
+          $q.notify(store.state.alerts[0])
+        });
+    }
+
+    async function resetPass() {
+      axios
+        .post("http://localhost:1337/api/auth/reset-password", {
+          "code": data.token,
+          "password": data.newPass,
+          "passwordConfirmation": data.newPass,
+        })
+        .then((response) => {
+          console.log("Your user's password has been reset.");
+          store.state.alerts[1].message="Password Reiniciado!"
+          $q.notify(store.state.alerts[1])
+        })
+        .catch((error) => {
+          console.log("An error occurred:", error.response);
+          store.state.alerts[0].message="Error con Reinicio de contraseña!"
+          $q.notify(store.state.alerts[0])
+        });
+    }
 
     function editFields(params) {
       (data.emailedit = selected.value[0].email),
@@ -336,15 +483,13 @@ export default {
     }
 
     function Create() {
-      if(data.rol=="Public"){
-        data.rolId="2"
-      }
-      if(data.rol=="Autenticado"){
-        data.rolId="1"
-      }
-      if(data.rol=="Administrador"){
-        data.rolId="3"
-      }
+      console.log(data.options);
+      console.log(data.rol);
+      data.options.forEach((element) => {
+        if (data.rol == element.name) {
+          data.rolId = element.id;
+        }
+      });
       axios
         .post("http://localhost:1337/api/users", {
           email: data.email,
@@ -361,27 +506,24 @@ export default {
             id: data.rolId,
           },
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
+            Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
           console.log(response);
-          data.rows.push(
-            {
-              name: data.username,
-              email: data.email,
-              nombre: data.nombre,
-              apellidos: data.apellidos,
-              CI: data.ci,
-              Telefono: data.telefono,
-              DirPart: data.dirPart,
-              NoSolapin: data.noSolapin,
-              Rol: data.rol,
-              id: "",
-              category: "breakfast",
-            }
-          )
+          data.rows.push({
+            name: data.username,
+            email: data.email,
+            nombre: data.nombre,
+            apellidos: data.apellidos,
+            CI: data.ci,
+            Telefono: data.telefono,
+            DirPart: data.dirPart,
+            NoSolapin: data.noSolapin,
+            Rol: data.rol,
+            id: "",
+            category: "breakfast",
+          });
         })
         .catch(function (error) {
           console.log(error.response);
@@ -396,7 +538,11 @@ export default {
           },
         })
         .then(function (response) {
-          console.log(response);
+          data.rows.forEach((element, index) => {
+            if (element === selected.value[0]) {
+              data.rows.splice(index, 1);
+            }
+          });
         })
         .catch(function (error) {
           console.log(error);
@@ -404,19 +550,15 @@ export default {
     }
 
     function Edit(params) {
-      if(data.roledit=="Public"){
-        data.rolIdedit="2"
-      }
-      if(data.roledit=="Autenticado"){
-        data.rolIdedit="1"
-      }
-      if(data.roledit=="Administrador"){
-        data.rolIdedit="3"
-      }
+      data.options.forEach((element) => {
+        if (data.roledit == element.name) {
+          data.rolIdedit = element.id;
+        }
+      });
       axios
         .put(`http://localhost:1337/api/users/${selected.value[0].id}`, {
           headers: {
-            Authorization: "Bearer "+store.state.jwt,
+            Authorization: "Bearer " + store.state.jwt,
           },
           email: data.emailedit,
           username: data.usernameedit,
@@ -433,15 +575,15 @@ export default {
         })
         .then(function (response) {
           console.log(response);
-          selected.value[0].name=data.usernameedit
-          selected.value[0].email=data.emailedit
-          selected.value[0].nombre=data.nombreedit
-          selected.value[0].apellidos=data.apellidosedit
-          selected.value[0].CI=data.ciedit
-          selected.value[0].Telefono=data.telefonoedit
-          selected.value[0].DirPart=data.dirPartedit
-          selected.value[0].NoSolapin=data.noSolapinedit
-          selected.value[0].Rol=data.roledit
+          selected.value[0].name = data.usernameedit;
+          selected.value[0].email = data.emailedit;
+          selected.value[0].nombre = data.nombreedit;
+          selected.value[0].apellidos = data.apellidosedit;
+          selected.value[0].CI = data.ciedit;
+          selected.value[0].Telefono = data.telefonoedit;
+          selected.value[0].DirPart = data.dirPartedit;
+          selected.value[0].NoSolapin = data.noSolapinedit;
+          selected.value[0].Rol = data.roledit;
         })
         .catch(function (error) {
           console.log(error.response);
@@ -524,6 +666,8 @@ export default {
       Delete,
       Edit,
       editFields,
+      sendMail,
+      resetPass
     };
   },
 };

@@ -34,6 +34,7 @@
         <q-img
           src="~assets/JovenClubW.jpeg"
           :ratio="16/9"
+          width="360px"
         />
       </div>
       <router-view />
@@ -83,12 +84,21 @@ const linksListAuth = [
     caption: "Editar Informacion",
     icon: "settings",
     link: "/editarinf",
+  }
+];
+
+const linksListEncCaj = [
+  {
+    title: "Editar Informacion",
+    caption: "Editar Informacion",
+    icon: "settings",
+    link: "/editarinf",
   },
   {
     title: "Gestionar vueltas",
     caption: "Gestionar vueltas",
     icon: "cached",
-    link: "/Gestionar_Vueltas",
+    link: "/gestionarvueltas",
   },
 ];
 
@@ -128,7 +138,7 @@ export default defineComponent({
       console.log("update");
       console.log(router.currentRoute.value.path);
       axios
-        .get("http://localhost:1337/api/clientes/1", {
+        .get("http://localhost:1337/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -146,7 +156,7 @@ export default defineComponent({
               });
             });
             if (data.linkslist.length > 6) data.linkslist.splice(0, 5);
-          } else if (response.data.role.id === 1 && router.currentRoute.value.matched[1].path!=="/") {
+          } else if (response.data.role.id === 1 && router.currentRoute.value.matched[1].path!="/") {
             console.log("id2",response.data.role.id);
             linksListAuth.forEach((element) => {
               data.linkslist.unshift({
@@ -156,8 +166,20 @@ export default defineComponent({
                 link: element.link,
               });
             });
+            if (data.linkslist.length > 2) data.linkslist.splice(0, 1);
+          }else if (response.data.role.id === 16 ||  response.data.role.id === 17 && router.currentRoute.value.matched[1].path!="/") {
+            console.log("id2",response.data.role.id);
+            linksListEncCaj.forEach((element) => {
+              data.linkslist.unshift({
+                title: element.title,
+                caption: element.caption,
+                icon: element.icon,
+                link: element.link,
+              });
+            });
             if (data.linkslist.length > 3) data.linkslist.splice(0, 2);
-          } else if (router.currentRoute.value.matched[1].path == "/") {
+          }
+           else if (router.currentRoute.value.matched[1].path == "/") {
             data.linkslist.splice(0, data.linkslist.length-1);
             
           }
@@ -184,7 +206,7 @@ export default defineComponent({
     const sendGetRequest = async () => {
       try {
         const resp = await axios
-          .get("http://localhost:1337/api/clientes", {
+          .get("http://localhost:1337/api/clientes/$", {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
             },
@@ -203,6 +225,15 @@ export default defineComponent({
               clearInterval(interval);
             } else if (response.data.role.id === 1) {
               linksListAuth.forEach((element) => {
+                data.linkslist.unshift({
+                  title: element.title,
+                  caption: element.caption,
+                  icon: element.icon,
+                  link: element.link,
+                });
+              });
+            }else if (response.data.role.id === 16 || response.data.role.id === 17) {
+              linksListEncCaj.forEach((element) => {
                 data.linkslist.unshift({
                   title: element.title,
                   caption: element.caption,

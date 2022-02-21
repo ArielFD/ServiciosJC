@@ -208,7 +208,11 @@ export default {
           }
         )
         .then(function (response) {
-          console.log(response);
+          data.rows.forEach((element,index)=>{
+            if(element===selected.value[0]){
+              data.rows.splice(index,1)
+            }
+          })
         })
         .catch(function (error) {
           console.log(error);

@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <h5>{{ $route.name }}</h5>
-    <div class="row ">
+    <div class="row">
       <q-input
         v-model="data.star"
         filled
@@ -17,8 +17,14 @@
         class="col q-pa-xs q-mb-sm"
       />
       <div class="q-pa-md q-gutter-sm">
-      <q-btn flat round color="primary" icon="search" @click="getDates(data.star,data.end)"/>
-      <q-btn flat round color="primary" icon="cached" @click="resetSearch"/>
+        <q-btn
+          flat
+          round
+          color="primary"
+          icon="search"
+          @click="getDates(data.star, data.end)"
+        />
+        <q-btn flat round color="primary" icon="cached" @click="resetSearch" />
       </div>
     </div>
     <q-table
@@ -53,7 +59,7 @@
         filled
         class="col-6 q-ma-md"
         item-aligned
-        :input-style="{ fontSize: '40px', textAlign:'center' }"
+        :input-style="{ fontSize: '40px', textAlign: 'center' }"
       />
     </div>
     <div class="row">
@@ -62,13 +68,73 @@
         label="Retirar"
         class="col q-ma-md"
         @click="disminuirSaldo"
+        v-if="data.rol==='Encargado' || data.rol==='Administrador'"
       />
       <q-btn
         color="primary"
         label="Ingresar"
         class="col q-ma-md"
         @click="aumentarSaldo"
+        v-if="data.rol==='Cajero' || data.rol==='Administrador'"
       />
+      <q-btn
+        color="primary"
+        label="Nuevo Cliente"
+        class="col q-ma-md"
+        @click="data.cardCreate = true"
+        icon="group_add"
+        v-if="data.rol==='Cajero' || data.rol==='Administrador'"
+      />
+      <q-dialog v-model="data.cardCreate">
+        <q-card class="my-card">
+          <q-card-section>
+            <div class="text-h6">Nuevo Cliente</div>
+          </q-card-section>
+
+          <q-card-section>
+            <div>
+              <q-input
+                v-model="data.nombreCliente"
+                label="Nombre del Cliente"
+                class="my-input"
+              />
+              <q-input
+                v-model="data.nombreUsuario"
+                label="Nombre Usuario del Cajero"
+                class="my-input"
+              />
+            </div>
+            <div class="row">
+              <q-input
+                v-model.number="data.cantVueltas"
+                type="number"
+                class="col my-input"
+                item-aligned
+                :input-style="{ fontSize: '20px', textAlign: 'center' }"
+              />
+              <q-input
+                v-model.number="total"
+                outlined
+                class="col my-input"
+                item-aligned
+                :input-style="{ fontSize: '20px', textAlign: 'center' }"
+              />
+            </div>
+          </q-card-section>
+
+          <q-separator />
+
+          <q-card-actions align="right">
+            <q-btn
+              v-close-popup
+              flat
+              color="primary"
+              label="Crear"
+              @click="Create"
+            />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
     </div>
   </q-page>
 </template>
@@ -120,19 +186,23 @@ export default {
       star: "",
       end: "",
       search: "",
+      nombreCliente:"",
+      nombreUsuario:"",
+      fecha:"",
       precioServicio: 10,
       cantVueltas: 1,
       filterToggle: {
         breakfast: true,
       },
+      cardCreate: false,
+      rol:"Administrador"
     });
 
     onMounted(() => {
       axios
         .get("http://localhost:1337/api/ingresos", {
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
+            Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
@@ -154,6 +224,22 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
+
+        axios
+        .get("http://localhost:1337/api/clientes/$", {
+          headers: {
+            Authorization:
+              "Bearer "+store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          console.log(response);
+          data.rol=response.data.role.name
+          console.log(data.rol);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
 
     let filter = computed(() => {
@@ -165,29 +251,67 @@ export default {
       };
     });
 
+    let total = computed(() => {
+      return data.cantVueltas*data.precioServicio 
+    });
+
+    function Create() {
+      const d = new Date();
+      data.fecha = d.toISOString();
+      axios
+        .post("http://localhost:1337/api/ingresos", {
+          data:{
+          Fecha: data.fecha,
+          NombreCliente: data.nombreCliente,
+          NombreTrabajador: data.nombreUsuario,
+          Cantidad: data.cantVueltas*data.precioServicio,
+          },
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          console.log(response);
+          data.rows.push({
+              name: data.fecha.substring(0, 10).split("-")
+                .reverse()
+                .join("-"),
+              NombreCliente: data.nombreCliente,
+              NombreTrabajador:data.nombreUsuario,
+              Cantidad: data.cantVueltas*data.precioServicio,
+              id: "",
+              category: "breakfast",
+            });
+            data.cantVueltas=1
+        })
+        .catch(function (error) {
+          console.log(error.response);
+        });
+    }
+    
+
     function getDates(startDate, stopDate) {
       // var dateArray = data.rows;
       console.log(data.rows);
       var currentDate = moment(startDate).format("DD-MM-YYYY");
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
-      console.log("asd",startDate);
+      console.log("asd", startDate);
       data.rows.forEach((element) => {
         if (
           moment(element.name).format("MM-DD-YYYY") >= currentDate &&
           moment(element.name).format("MM-DD-YYYY") <= stopDate
         ) {
           console.log("true");
-          element.category ="breakfast"
+          element.category = "breakfast";
         } else {
-          element.category ="";
+          element.category = "";
         }
-        
       });
     }
 
-    function resetSearch(){
-      data.rows.forEach(element => {
-        element.category="breakfast"
+    function resetSearch() {
+      data.rows.forEach((element) => {
+        element.category = "breakfast";
       });
     }
 
@@ -254,9 +378,8 @@ export default {
             `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
             {
               headers: {
-                Authorization:
-                  "Bearer "+store.state.jwt,
-                  },
+                Authorization: "Bearer " + store.state.jwt,
+              },
               data: {
                 Cantidad:
                   selected.value[index].Cantidad +
@@ -285,9 +408,8 @@ export default {
             `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
             {
               headers: {
-                Authorization:
-                  "Bearer "+store.state.jwt,
-                  },
+                Authorization: "Bearer " + store.state.jwt,
+              },
               data: {
                 Cantidad:
                   selected.value[index].Cantidad -
@@ -319,11 +441,20 @@ export default {
       customFilter,
       filter,
       getDates,
-      resetSearch
+      resetSearch,
+      total,
+      Create
     };
   },
 };
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
+.my-card
+  width: 100%
+  max-width: 500px
+
+.my-input
+  width: 100%
+  max-width: 200px
 </style>

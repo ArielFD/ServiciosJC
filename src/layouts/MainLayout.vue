@@ -11,7 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Joven Club Service </q-toolbar-title>
+        <q-toolbar-title> Simuladores Palacio </q-toolbar-title>
 
         <div></div>
       </q-toolbar>
@@ -29,11 +29,11 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container class="contenedor q-pa-md">
+    <q-page-container class="contenedor q-pa-md q-mt-md">
       <div class="row justify-center">
         <q-img
-          src="~assets/JovenClubW.jpeg"
-          :ratio="16/9"
+          src="~assets/Simpal.png"
+          
           width="360px"
         />
       </div>

@@ -1,32 +1,7 @@
 <template>
   <q-page>
-    <h5>{{ $route.name }}</h5>
-    <div class="row">
-      <q-input
-        v-model="data.star"
-        filled
-        type="date"
-        hint="Desde"
-        class="col q-pa-xs q-mb-sm"
-      />
-      <q-input
-        v-model="data.end"
-        filled
-        type="date"
-        hint="Hasta"
-        class="col q-pa-xs q-mb-sm"
-      />
-      <div class="q-pa-md q-gutter-sm">
-        <q-btn
-          flat
-          round
-          color="primary"
-          icon="search"
-          @click="getDates(data.star, data.end)"
-        />
-        <q-btn flat round color="primary" icon="cached" @click="resetSearch" />
-      </div>
-    </div>
+    <h5>Listado</h5>
+    
     <q-table
       title="Ingresos"
       dense
@@ -68,14 +43,14 @@
         label="Retirar"
         class="col q-ma-md"
         @click="disminuirSaldo"
-        v-if="data.rol==='Encargado' || data.rol==='Administrador'"
+        v-if="data.rol === 'Encargado' || data.rol === 'Administrador'"
       />
       <q-btn
         color="primary"
         label="Ingresar"
         class="col q-ma-md"
         @click="aumentarSaldo"
-        v-if="data.rol==='Cajero' || data.rol==='Administrador'"
+        v-if="data.rol === 'Cajero' || data.rol === 'Administrador'"
       />
       <q-btn
         color="primary"
@@ -83,7 +58,7 @@
         class="col q-ma-md"
         @click="data.cardCreate = true"
         icon="group_add"
-        v-if="data.rol==='Cajero' || data.rol==='Administrador'"
+        v-if="data.rol === 'Cajero' || data.rol === 'Administrador'"
       />
       <q-dialog v-model="data.cardCreate">
         <q-card class="my-card">
@@ -144,6 +119,8 @@ import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
 import moment from "moment";
+import { getCurrentInstance } from "vue";
+const instance = getCurrentInstance();
 
 export default {
   setup() {
@@ -186,61 +163,67 @@ export default {
       star: "",
       end: "",
       search: "",
-      nombreCliente:"",
-      nombreUsuario:"",
-      fecha:"",
+      nombreCliente: "",
+      nombreUsuario: "",
+      fecha: "",
       precioServicio: 10,
       cantVueltas: 1,
       filterToggle: {
         breakfast: true,
       },
       cardCreate: false,
-      rol:"Administrador"
+      rol: "Administrador",
+      index:""
     });
 
     onMounted(() => {
-      axios
-        .get("http://localhost:1337/api/ingresos", {
-          headers: {
-            Authorization: "Bearer " + store.state.jwt,
-          },
-        })
-        .then(function (response) {
-          for (let i = 0; i < response.data.data.length; i++) {
-            data.rows.push({
-              name: response.data.data[i].attributes.Fecha.split("-")
-                .reverse()
-                .join("-"),
-              NombreCliente: response.data.data[i].attributes.NombreCliente,
-              NombreTrabajador:
-                response.data.data[i].attributes.NombreTrabajador,
-              Cantidad: response.data.data[i].attributes.Cantidad,
-              id: response.data.data[i].id,
-              category: "breakfast",
-            });
-          }
-          console.log(data.rows);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+      sendGetRequest();
+    });
+
+    setInterval(function () {
+      sendGetRequest();
+    }, 1000);
+
+    function sendGetRequest(){
+        axios
+          .get("http://localhost:1337/api/ingresos", {
+            headers: {
+              Authorization: "Bearer " + store.state.jwt,
+            },
+          })
+          .then(function (response) {
+            data.rows=[]
+            for (let i = 0; i < response.data.data.length; i++) {
+              data.rows.push({
+                name: response.data.data[i].attributes.Fecha.split("-")
+                  .reverse()
+                  .join("-"),
+                NombreCliente: response.data.data[i].attributes.NombreCliente,
+                NombreTrabajador:
+                  response.data.data[i].attributes.NombreTrabajador,
+                Cantidad: response.data.data[i].attributes.Cantidad,
+                id: response.data.data[i].id,
+                category: "breakfast",
+              });
+            }
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
 
         axios
-        .get("http://localhost:1337/api/clientes/$", {
-          headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-          },
-        })
-        .then(function (response) {
-          console.log(response);
-          data.rol=response.data.role.name
-          console.log(data.rol);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    });
+          .get("http://localhost:1337/api/clientes/$", {
+            headers: {
+              Authorization: "Bearer " + store.state.jwt,
+            },
+          })
+          .then(function (response) {
+            data.rol = response.data.role.name;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+    };
 
     let filter = computed(() => {
       return {
@@ -252,7 +235,7 @@ export default {
     });
 
     let total = computed(() => {
-      return data.cantVueltas*data.precioServicio 
+      return data.cantVueltas * data.precioServicio;
     });
 
     function Create() {
@@ -260,48 +243,41 @@ export default {
       data.fecha = d.toISOString();
       axios
         .post("http://localhost:1337/api/ingresos", {
-          data:{
-          Fecha: data.fecha,
-          NombreCliente: data.nombreCliente,
-          NombreTrabajador: data.nombreUsuario,
-          Cantidad: data.cantVueltas*data.precioServicio,
+          data: {
+            Fecha: data.fecha,
+            NombreCliente: data.nombreCliente,
+            NombreTrabajador: data.nombreUsuario,
+            Cantidad: data.cantVueltas * data.precioServicio,
           },
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
-          console.log(response);
           data.rows.push({
-              name: data.fecha.substring(0, 10).split("-")
-                .reverse()
-                .join("-"),
-              NombreCliente: data.nombreCliente,
-              NombreTrabajador:data.nombreUsuario,
-              Cantidad: data.cantVueltas*data.precioServicio,
-              id: "",
-              category: "breakfast",
-            });
-            data.cantVueltas=1
+            name: data.fecha.substring(0, 10).split("-").reverse().join("-"),
+            NombreCliente: data.nombreCliente,
+            NombreTrabajador: data.nombreUsuario,
+            Cantidad: data.cantVueltas * data.precioServicio,
+            id: "",
+            category: "breakfast",
+          });
+          data.cantVueltas = 1;
         })
         .catch(function (error) {
           console.log(error.response);
         });
     }
-    
 
     function getDates(startDate, stopDate) {
       // var dateArray = data.rows;
-      console.log(data.rows);
       var currentDate = moment(startDate).format("DD-MM-YYYY");
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
-      console.log("asd", startDate);
       data.rows.forEach((element) => {
         if (
           moment(element.name).format("MM-DD-YYYY") >= currentDate &&
           moment(element.name).format("MM-DD-YYYY") <= stopDate
         ) {
-          console.log("true");
           element.category = "breakfast";
         } else {
           element.category = "";
@@ -373,36 +349,37 @@ export default {
 
     function aumentarSaldo() {
       selected.value.forEach(function (item, index, array) {
-        axios
-          .put(
-            `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
-            {
-              headers: {
-                Authorization: "Bearer " + store.state.jwt,
-              },
-              data: {
-                Cantidad:
-                  selected.value[index].Cantidad +
-                  data.precioServicio * data.cantVueltas,
-              },
-            }
-          )
-          .then(function (response) {
-            console.log(response);
-            data.rows.forEach((item) => {
-              if (item.id == selected.value[index].id) {
-                item.Cantidad += data.precioServicio * data.cantVueltas;
-              }
-            });
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        data.rows.forEach(element => {
+          if(element.id===selected.value[index].id){
+            axios
+              .put(
+                `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
+                {
+                  headers: {
+                    Authorization: "Bearer " + store.state.jwt,
+                  },
+                  data: {
+                    Cantidad:
+                      element.Cantidad +
+                      data.precioServicio * data.cantVueltas,
+                  },
+                }
+              )
+              .then(function (response) {
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+            
+          }
+        });
       });
     }
 
     function disminuirSaldo() {
       selected.value.forEach(function (item, index, array) {
+        data.rows.forEach(element => {
+          if(element.id===selected.value[index].id){
         axios
           .put(
             `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
@@ -412,22 +389,18 @@ export default {
               },
               data: {
                 Cantidad:
-                  selected.value[index].Cantidad -
+                  element.Cantidad -
                   data.precioServicio * data.cantVueltas,
               },
             }
           )
           .then(function (response) {
-            console.log(response);
-            data.rows.forEach((item) => {
-              if (item.id == selected.value[index].id) {
-                item.Cantidad -= data.precioServicio * data.cantVueltas;
-              }
-            });
           })
           .catch(function (error) {
             console.log(error);
           });
+          }
+        })
       });
     }
 
@@ -443,7 +416,7 @@ export default {
       getDates,
       resetSearch,
       total,
-      Create
+      Create,
     };
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>Usuarios</h5>
+    <h5>Ingresos</h5>
     <div class="row ">
       <q-input
         v-model="data.star"
@@ -150,7 +150,6 @@ export default {
     });
 
     watch(data,(newValue) => {
-      console.log("newValue");
       data.total=0
       data.rows.forEach(element => {
         if(element.category=="breakfast"){
@@ -160,13 +159,21 @@ export default {
     })
 
     function getDates(startDate, stopDate) {
-      var dateArray = data.rows;
       var currentDate = moment(startDate).format("DD-MM-YYYY");
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
+      console.log(currentDate);
+      console.log(stopDate);
+      console.log(data.rows);
       data.rows.forEach((element) => {
+        const arr=element.name.split("-")
+        let temp=arr[0]
+        arr[0]=arr[1]
+        arr[1]=temp
+        arr.join("-")
+        console.log(moment(arr.join("-")));
         if (
-          moment(element.name).format("MM-DD-YYYY") >= currentDate &&
-          moment(element.name).format("MM-DD-YYYY") <= stopDate
+          moment(arr.join("-")).format("DD-MM-YYYY") >= currentDate &&
+          moment(arr.join("-")).format("DD-MM-YYYY") <= stopDate
         ) {
           element.category="breakfast"
         } else {

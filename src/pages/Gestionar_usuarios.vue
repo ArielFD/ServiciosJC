@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>Usuarios{{ selected }}</h5>
+    <h5>Usuarios</h5>
     <q-table
       title="Ingresos"
       dense

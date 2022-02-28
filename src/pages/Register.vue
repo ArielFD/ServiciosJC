@@ -1,6 +1,6 @@
 <template>
   <q-page>
-    <h5>REGISTER</h5>
+    <h5>Registro de Usuario</h5>
     <form @submit.prevent.stop="onSubmit" class="q-gutter-md">
       <q-input v-model="data.username" label="Nombre de Usuario" />
       <q-input
@@ -35,7 +35,7 @@
       <div class="row-4 q-pa-md">
         <q-btn
           color="primary"
-          label="Create Acount"
+          label="Crear Cuenta"
           class="col q-ma-sm"
           @click="register"
         />
@@ -93,9 +93,17 @@ export default {
             });
         })
         .catch((error) => {
-          console.log("An error occurred:", error.response);
-          store.state.alerts[0].message = "Error al registrar el usuario!";
+          if(error.response.data.error.details.errors!=null){
+          error.response.data.error.details.errors.forEach(element => {
+            store.state.errors=store.state.errors+", "+element.message
+            console.log(store.state.errors);
+          });
+          }else{
+            store.state.errors=store.state.errors+", "+error.response.data.error.message
+          }
+          store.state.alerts[0].message = "Error al registrar el usuario! "+store.state.errors
           $q.notify(store.state.alerts[0]);
+          store.state.errors=""
         });
     }
 

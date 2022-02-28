@@ -5,23 +5,66 @@
       v-model="data.username"
       label="Nombre de Usuario"
       class="my-input"
+      lazy-rules
+      :rules="store.state.inputRules"
     />
-    <q-input v-model="data.nombre" label="Nombre" class="my-input" />
-    <q-input v-model="data.apellidos" label="Apellidos" class="my-input" />
-    <q-input v-model="data.email" label="Email" class="my-input2">
+    <q-input
+      v-model="data.nombre"
+      label="Nombre"
+      class="my-input"
+      lazy-rules
+      :rules="store.state.inputRules"
+    />
+    <q-input
+      v-model="data.apellidos"
+      label="Apellidos"
+      class="my-input"
+      lazy-rules
+      :rules="store.state.inputRules"
+    />
+    <q-input
+      v-model="data.email"
+      label="Email"
+      class="my-input2"
+      lazy-rules
+      :rules="store.state.emailRules"
+    >
       <template v-slot:prepend>
         <q-icon name="mail" />
       </template>
     </q-input>
-    <q-input v-model="data.ci" label="Carnet Identidad" class="my-input" />
-    <q-input v-model="data.telefono" label="Telefono" class="my-input" />
-    <q-input v-model="data.dirPart" label="Direccion Particular" class="my-input2" />
-    <q-input v-model="data.noSolapin" label="No Solapin" class="my-input" />
+    <q-input
+      v-model="data.ci"
+      label="Carnet Identidad"
+      class="my-input"
+      :rules="[store.methods.myRule]"
+    />
+    <q-input
+      v-model="data.telefono"
+      label="Telefono"
+      class="my-input"
+      lazy-rules
+      :rules="store.state.inputTelephone"
+    />
+    <q-input
+      v-model="data.dirPart"
+      label="Direccion Particular"
+      class="my-input2"
+      lazy-rules
+      :rules="store.state.inputRules"
+    />
+    <q-input
+      v-model="data.noSolapin"
+      label="No Solapin"
+      class="my-input"
+      lazy-rules
+      :rules="store.state.inputRules"
+    />
     <div class="row q-pa-lg q-mt-md justify-end">
       <div class="q-ma-sm">
-        <span class="col">To Change Password Click: </span>
+        <span class="col">Cambiar Contraseña : </span>
       </div>
-      <q-btn color="primary" label="HERE" class="col-4" @click="sendMail"/>
+      <q-btn color="primary" label="Click" class="col-4" @click="sendMail" />
 
       <q-dialog v-model="data.cardPass">
         <q-card class="my-card">
@@ -65,7 +108,12 @@
       </q-dialog>
     </div>
     <div class="row justify-center">
-      <q-btn color="primary" label="Guardar Cambios" class="full-width" @click="Edit"/>
+      <q-btn
+        color="primary"
+        label="Guardar Cambios"
+        class="full-width"
+        @click="Edit"
+      />
     </div>
   </q-page>
 </template>
@@ -76,14 +124,14 @@ import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
 import { Dialog } from "quasar";
-import { useQuasar } from 'quasar'
+import { useQuasar } from "quasar";
 
 export default {
   setup() {
     const router = useRouter();
     const route = useRoute();
     const store = inject("store");
-    const $q = useQuasar()        
+    const $q = useQuasar();
     let data = reactive({
       username: "",
       nombre: "",
@@ -95,44 +143,41 @@ export default {
       telefono: "",
       dirPart: "",
       noSolapin: "",
-      id:"",
-      cardPass:false,
-      token:"",
-      newPass:""
+      id: "",
+      cardPass: false,
+      token: "",
+      newPass: "",
     });
 
     onMounted(() => {
-
       axios
         .get("http://localhost:1337/api/clientes/$", {
           headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
+            Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
           console.log(response);
-          data.apellidos=response.data.Apellidos
-          data.dirPart=response.data.DireccionParticular
-          data.noSolapin=response.data.NoSolapin
-          data.nombre=response.data.Nombre
-          data.telefono=response.data.Telefono
-          data.email=response.data.email
-          data.username=response.data.username
-          data.ci=response.data.NoIdentidad
-          data.id=response.data.id
+          data.apellidos = response.data.Apellidos;
+          data.dirPart = response.data.DireccionParticular;
+          data.noSolapin = response.data.NoSolapin;
+          data.nombre = response.data.Nombre;
+          data.telefono = response.data.Telefono;
+          data.email = response.data.email;
+          data.username = response.data.username;
+          data.ci = response.data.NoIdentidad;
+          data.id = response.data.id;
         })
         .catch(function (error) {
           console.log(error);
         });
-    
-    })
+    });
 
     function Edit(params) {
       axios
         .put(`http://localhost:1337/api/users/${data.id}`, {
           headers: {
-            Authorization: "Bearer "+store.state.jwt,
+            Authorization: "Bearer " + store.state.jwt,
           },
           email: data.email,
           username: data.username,
@@ -153,63 +198,62 @@ export default {
     }
 
     async function sendMail() {
-      data.cardPass=true
+      data.cardPass = true;
       await axios
         .post("http://localhost:1337/api/auth/forgot-password", {
           email: data.email, // user's email
         })
         .then((response) => {
           console.log("Your user received an email");
-          store.state.alerts[1].message="Enviado email de confirmacion!"
-          $q.notify(store.state.alerts[1])
+          store.state.alerts[1].message = "Enviado email de confirmacion!";
+          $q.notify(store.state.alerts[1]);
           axios
-        .get("http://localhost:1337/api/clientes/$", {
-          headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-          },
-        })
-        .then(function (response) {
-          console.log(response);
-          data.token=response.data.resetPasswordToken
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+            .get("http://localhost:1337/api/clientes/$", {
+              headers: {
+                Authorization: "Bearer " + store.state.jwt,
+              },
+            })
+            .then(function (response) {
+              console.log(response);
+              data.token = response.data.resetPasswordToken;
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
-          store.state.alerts[0].message="Error con el envio de emai de confirmacion!"
-          $q.notify(store.state.alerts[0])
+          store.state.alerts[0].message =
+            "Error con el envio de emai de confirmacion!";
+          $q.notify(store.state.alerts[0]);
         });
     }
 
     async function resetPass() {
       axios
         .post("http://localhost:1337/api/auth/reset-password", {
-          "code": data.token,
-          "password": data.newPass,
-          "passwordConfirmation": data.newPass,
+          code: data.token,
+          password: data.newPass,
+          passwordConfirmation: data.newPass,
         })
         .then((response) => {
           console.log("Your user's password has been reset.");
-          store.state.alerts[1].message="Password Reiniciado!"
-          $q.notify(store.state.alerts[1])
+          store.state.alerts[1].message = "Password Reiniciado!";
+          $q.notify(store.state.alerts[1]);
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
-          store.state.alerts[0].message="Error con Reinicio de contraseña!"
-          $q.notify(store.state.alerts[0])
+          store.state.alerts[0].message = "Error con Reinicio de contraseña!";
+          $q.notify(store.state.alerts[0]);
         });
     }
-
 
     return {
       data,
       store,
       Edit,
       sendMail,
-      resetPass
+      resetPass,
     };
   },
 };

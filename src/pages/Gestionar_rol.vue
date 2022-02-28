@@ -31,7 +31,7 @@
         color="primary"
         label="Crear"
         class="col q-ma-md"
-        @click="data.cardCreate=true"
+        @click="data.cardCreate = true"
       />
       <q-dialog v-model="data.cardCreate">
         <q-card class="my-card">
@@ -40,8 +40,20 @@
           </q-card-section>
 
           <q-card-section>
-            <q-input v-model="data.nameRol" label="Nombre del Rol" class="my-input"/>
-            <q-input v-model="data.descriptionRol"  label="Descripcion del Rol" autogrow />
+            <q-input
+              v-model="data.nameRol"
+              label="Nombre del Rol"
+              class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
+            <q-input
+              v-model="data.descriptionRol"
+              label="Descripcion del Rol"
+              autogrow
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
           </q-card-section>
 
           <q-separator />
@@ -70,8 +82,20 @@
           </q-card-section>
 
           <q-card-section>
-            <q-input v-model="data.nameRolEdit" label="Nombre del Rol" class="my-input"/>
-            <q-input v-model="data.descriptionRolEdit"  label="Descripcion del Rol" autogrow />
+            <q-input
+              v-model="data.nameRolEdit"
+              label="Nombre del Rol"
+              class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
+            <q-input
+              v-model="data.descriptionRolEdit"
+              label="Descripcion del Rol"
+              autogrow
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
           </q-card-section>
 
           <q-separator />
@@ -128,11 +152,11 @@ export default {
         },
       ],
       rows: [],
-      search:"",
+      search: "",
       nameRol: "",
       descriptionRol: "",
-      nameRolEdit:"",
-      descriptionRolEdit:"",
+      nameRolEdit: "",
+      descriptionRolEdit: "",
       cardCreate: false,
       cardEdit: false,
       isPwd: false,
@@ -167,9 +191,9 @@ export default {
     });
 
     function editFields(params) {
-      data.nameRolEdit=selected.value[0].name,
-      data.descriptionRolEdit=selected.value[0].Descripcion,
-      data.cardEdit=true
+      (data.nameRolEdit = selected.value[0].name),
+        (data.descriptionRolEdit = selected.value[0].Descripcion),
+        (data.cardEdit = true);
     }
 
     function Create() {
@@ -183,14 +207,12 @@ export default {
         })
         .then(function (response) {
           console.log(response);
-          data.rows.push(
-            {
-              name: data.nameRol,
-              Descripcion: data.descriptionRol,
-              id: "",
-              category: "breakfast",
-            }
-          )
+          data.rows.push({
+            name: data.nameRol,
+            Descripcion: data.descriptionRol,
+            id: "",
+            category: "breakfast",
+          });
         })
         .catch(function (error) {
           console.log(error);
@@ -208,11 +230,11 @@ export default {
           }
         )
         .then(function (response) {
-          data.rows.forEach((element,index)=>{
-            if(element===selected.value[0]){
-              data.rows.splice(index,1)
+          data.rows.forEach((element, index) => {
+            if (element === selected.value[0]) {
+              data.rows.splice(index, 1);
             }
-          })
+          });
         })
         .catch(function (error) {
           console.log(error);
@@ -233,8 +255,8 @@ export default {
         )
         .then(function (response) {
           console.log(response);
-          selected.value[0].name=data.nameRolEdit
-          selected.value[0].Descripcion=data.descriptionRolEdit
+          selected.value[0].name = data.nameRolEdit;
+          selected.value[0].Descripcion = data.descriptionRolEdit;
         })
         .catch(function (error) {
           console.log(error);
@@ -316,7 +338,7 @@ export default {
       Create,
       Delete,
       Edit,
-      editFields
+      editFields,
     };
   },
 };

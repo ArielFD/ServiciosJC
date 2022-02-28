@@ -3,13 +3,12 @@
     <h5>LOGIN</h5>
     <form @submit.prevent.stop="onSubmit" class="q-gutter-md">
     <q-input
-      ref="emailRef"
-      v-model="data.email"
-      type="email"
-      prefix="Email:"
-      @keyup.enter="Login"
-      lazy-rules
-      :rules="store.state.emailRules"
+      ref="nameRef"
+        filled
+        v-model="data.email"
+        label="Email"
+        lazy-rules
+        :rules="store.state.emailRules"
     >
       <template v-slot:prepend>
         <q-icon name="mail" />
@@ -40,7 +39,6 @@
     >
     <div class="column">
       <q-btn
-        @click="Login"
         color="primary"
         label="LOGIN"
         class="q-mt-xl col self-center"
@@ -70,60 +68,58 @@ export default {
     const route = useRoute();
     const $q = useQuasar() 
 
+    const nameRef = ref(null)
+
     let data = reactive({
       password: "",
       isPwd: true,
       email: "",
       username: "",
-      nameRef:"",
     });
 
     
-    async function Login() {
-      await axios
-        .post("http://localhost:1337/api/auth/local", {
-          identifier: data.email,
-          password: data.password,
-        })
-        .then(function (response) {
-          console.log(response);
-          store.state.alerts[1].message="Sesion Iniciada, Bienvenido!!!"
-          $q.notify(store.state.alerts[1])
-          store.state.jwt = response.data.jwt;
-          console.log(store.state.jwt);
-          router.push("/usuario");
-        })
-        .catch(function (error) {
-          console.log(error.response);
-          store.state.alerts[0].message="Credenciales incorrectas"
-          $q.notify(store.state.alerts[0])
-        });
-    }
+        async function Login() {
+          await axios
+            .post("http://localhost:1337/api/auth/local", {
+              identifier: data.email,
+              password: data.password,
+            })
+            .then(function (response) {
+              console.log(response);
+              store.state.alerts[1].message="Sesion Iniciada, Bienvenido!!!"
+              $q.notify(store.state.alerts[1])
+              store.state.jwt = response.data.jwt;
+              console.log(store.state.jwt);
+              router.push("/usuario");
+            })
+            .catch(function (error) {
+              console.log(error.response);
+              store.state.alerts[0].message="Credenciales incorrectas"
+              $q.notify(store.state.alerts[0])
+            });
+        }
 
-    function onSubmit () {
+      function onSubmit () {
+        nameRef.value.validate()
 
-        // if (data.nameRef="") {
-        //   // form has error
-        //   $q.notify({
-        //     icon: 'done',
-        //     color: 'positive',
-        //     message: 'Submitted'
-        //   })
-        // }
-        // else {
-        //   $q.notify({
-        //     icon: 'done',
-        //     color: 'positive',
-        //     message: 'Submitted'
-        //   })
-        // }
+        if (nameRef.value.hasError) {
+          $q.notify({
+            color: 'negative',
+            message: 'You need to accept the license and terms first'
+          })
+          // form has error
+        }
+        else {
+          Login()
+        }
       }
 
     return {
       store,
       data,
       Login,
-      onSubmit
+      onSubmit,
+      nameRef,
       
     };
   },

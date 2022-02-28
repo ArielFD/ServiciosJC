@@ -44,14 +44,29 @@
               v-model="data.username"
               label="Nombre de Usuario"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
-            <q-input v-model="data.nombre" label="Nombre" class="my-input" />
+            <q-input
+              v-model="data.nombre"
+              label="Nombre"
+              class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
             <q-input
               v-model="data.apellidos"
               label="Apellidos"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
-            <q-input v-model="data.email" label="Email">
+            <q-input
+              v-model="data.email"
+              label="Email"
+              lazy-rules
+              :rules="store.state.emailRules"
+            >
               <template v-slot:prepend>
                 <q-icon name="mail" />
               </template>
@@ -78,17 +93,27 @@
               v-model="data.ci"
               label="Carnet Identidad"
               class="my-input"
+              :rules="[store.methods.myRule]"
             />
             <q-input
               v-model="data.telefono"
               label="Telefono"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputTelephone"
             />
-            <q-input v-model="data.dirPart" label="Direccion Particular" />
+            <q-input
+              v-model="data.dirPart"
+              label="Direccion Particular"
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
             <q-input
               v-model="data.noSolapin"
               label="No Solapin"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
             <q-select
               filled
@@ -128,18 +153,29 @@
               v-model="data.usernameedit"
               label="Nombre de Usuario"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
             <q-input
               v-model="data.nombreedit"
               label="Nombre"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
             <q-input
               v-model="data.apellidosedit"
               label="Apellidos"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
-            <q-input v-model="data.emailedit" label="Email">
+            <q-input
+              v-model="data.emailedit"
+              label="Email"
+              lazy-rules
+              :rules="store.state.emailRules"
+            >
               <template v-slot:prepend>
                 <q-icon name="mail" />
               </template>
@@ -148,17 +184,27 @@
               v-model="data.ciedit"
               label="Carnet Identidad"
               class="my-input"
+              :rules="[store.methods.myRule]"
             />
             <q-input
               v-model="data.telefonoedit"
               label="Telefono"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputTelephone"
             />
-            <q-input v-model="data.dirPartedit" label="Direccion Particular" />
+            <q-input
+              v-model="data.dirPartedit"
+              label="Direccion Particular"
+              lazy-rules
+              :rules="store.state.inputRules"
+            />
             <q-input
               v-model="data.noSolapinedit"
               label="No Solapin"
               class="my-input"
+              lazy-rules
+              :rules="store.state.inputRules"
             />
             <q-select
               filled
@@ -245,11 +291,11 @@ import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
 import { Dialog } from "quasar";
-import { useQuasar } from 'quasar'
-    
+import { useQuasar } from "quasar";
+
 export default {
   setup() {
-    const $q = useQuasar()        
+    const $q = useQuasar();
     const store = inject("store");
     const selected = ref([]);
     let data = reactive({
@@ -350,9 +396,9 @@ export default {
       roledit: "",
       rolIdedit: "",
 
-      newPass:"",
-      token:"",
-      cardPass:false,
+      newPass: "",
+      token: "",
+      cardPass: false,
       cardEdit: false,
       cardCreate: false,
       isPwd: true,
@@ -414,7 +460,7 @@ export default {
     });
 
     async function sendMail() {
-      data.cardPass=true
+      data.cardPass = true;
       console.log(data.emailedit);
       await axios
         .post("http://localhost:1337/api/auth/forgot-password", {
@@ -422,50 +468,50 @@ export default {
         })
         .then((response) => {
           console.log("Your user received an email");
-          store.state.alerts[1].message="Enviado email de confirmacion!"
-          $q.notify(store.state.alerts[1])
+          store.state.alerts[1].message = "Enviado email de confirmacion!";
+          $q.notify(store.state.alerts[1]);
           axios
-        .get("http://localhost:1337/api/clientes", {
-          headers: {
-            Authorization:
-              "Bearer "+store.state.jwt,
-          },
-        })
-        .then(function (response) {
-          console.log(response);
-          response.data.forEach(element => {
-            if(element.email===data.emailedit){
-              data.token=element.resetPasswordToken
-            }
-          });
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+            .get("http://localhost:1337/api/clientes", {
+              headers: {
+                Authorization: "Bearer " + store.state.jwt,
+              },
+            })
+            .then(function (response) {
+              console.log(response);
+              response.data.forEach((element) => {
+                if (element.email === data.emailedit) {
+                  data.token = element.resetPasswordToken;
+                }
+              });
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
-          store.state.alerts[0].message="Error con el envio de emai de confirmacion!"
-          $q.notify(store.state.alerts[0])
+          store.state.alerts[0].message =
+            "Error con el envio de emai de confirmacion!";
+          $q.notify(store.state.alerts[0]);
         });
     }
 
     async function resetPass() {
       axios
         .post("http://localhost:1337/api/auth/reset-password", {
-          "code": data.token,
-          "password": data.newPass,
-          "passwordConfirmation": data.newPass,
+          code: data.token,
+          password: data.newPass,
+          passwordConfirmation: data.newPass,
         })
         .then((response) => {
           console.log("Your user's password has been reset.");
-          store.state.alerts[1].message="Password Reiniciado!"
-          $q.notify(store.state.alerts[1])
+          store.state.alerts[1].message = "Password Reiniciado!";
+          $q.notify(store.state.alerts[1]);
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
-          store.state.alerts[0].message="Error con Reinicio de contraseña!"
-          $q.notify(store.state.alerts[0])
+          store.state.alerts[0].message = "Error con Reinicio de contraseña!";
+          $q.notify(store.state.alerts[0]);
         });
     }
 
@@ -667,7 +713,7 @@ export default {
       Edit,
       editFields,
       sendMail,
-      resetPass
+      resetPass,
     };
   },
 };

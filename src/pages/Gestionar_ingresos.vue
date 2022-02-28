@@ -71,12 +71,19 @@ export default {
     let data = reactive({
       columns: [
         {
-          name: "Fecha",
+          name: "id",
           required: true,
-          label: "Fecha",
+          label: "id",
           align: "left",
           field: (row) => row.name,
           format: (val) => `${val}`,
+          sortable: true,
+        },
+        {
+          name: "Fecha",
+          align: "center",
+          label: "Fecha",
+          field: "Fecha",
           sortable: true,
         },
         {
@@ -123,14 +130,16 @@ export default {
           for (let i = 0; i < response.data.data.length; i++) {
             data.total+=response.data.data[i].attributes.Cantidad
             data.rows.push({
-              name: response.data.data[i].attributes.Fecha.split("-")
-                .reverse()
-                .join("-"),
+              name: response.data.data[i].id,
               NombreCliente: response.data.data[i].attributes.NombreCliente,
               NombreTrabajador:
                 response.data.data[i].attributes.NombreTrabajador,
               Cantidad: response.data.data[i].attributes.Cantidad,
-              id: response.data.data[i].id,
+              VueltasRestantes:
+                response.data.data[i].attributes.VueltasRestantes,
+              Fecha: response.data.data[i].attributes.Fecha.split("-")
+                .reverse()
+                .join("-"),
               category: "breakfast",
             });
           }
@@ -161,11 +170,8 @@ export default {
     function getDates(startDate, stopDate) {
       var currentDate = moment(startDate).format("DD-MM-YYYY");
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
-      console.log(currentDate);
-      console.log(stopDate);
-      console.log(data.rows);
       data.rows.forEach((element) => {
-        const arr=element.name.split("-")
+        const arr=element.Fecha.split("-")
         let temp=arr[0]
         arr[0]=arr[1]
         arr[1]=temp
@@ -181,6 +187,22 @@ export default {
         }
       });
     }
+
+    // function getDates(startDate, stopDate) {
+    //   // var dateArray = data.rows;
+    //   var currentDate = moment(startDate).format("DD-MM-YYYY");
+    //   var stopDate = moment(stopDate).format("DD-MM-YYYY");
+    //   data.rows.forEach((element) => {
+    //     if (
+    //       moment(element.Fecha).format("MM-DD-YYYY") >= currentDate &&
+    //       moment(element.Fecha).format("MM-DD-YYYY") <= stopDate
+    //     ) {
+    //       element.category = "breakfast";
+    //     } else {
+    //       element.category = "";
+    //     }
+    //   });
+    // }
 
     function resetSearch(){
       data.rows.forEach(element => {

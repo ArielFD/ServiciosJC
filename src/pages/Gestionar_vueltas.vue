@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <h5>Listado</h5>
-    
+
     <q-table
       title="Ingresos"
       dense
@@ -72,11 +72,14 @@
                 v-model="data.nombreCliente"
                 label="Nombre del Cliente"
                 class="my-input"
+                lazy-rules
+                :rules="store.state.inputRules"
               />
               <q-input
-                v-model="data.nombreUsuario"
+                v-model="data.username"
                 label="Nombre Usuario del Cajero"
                 class="my-input"
+                readonly
               />
             </div>
             <div class="row">
@@ -129,12 +132,19 @@ export default {
     let data = reactive({
       columns: [
         {
-          name: "Fecha",
+          name: "id",
           required: true,
-          label: "Fecha",
+          label: "id",
           align: "left",
           field: (row) => row.name,
           format: (val) => `${val}`,
+          sortable: true,
+        },
+        {
+          name: "Fecha",
+          align: "center",
+          label: "Fecha",
+          field: "Fecha",
           sortable: true,
         },
         {
@@ -152,6 +162,13 @@ export default {
           sortable: true,
         },
         {
+          name: "VueltasRestantes",
+          align: "center",
+          label: "Vueltas Restantes",
+          field: "VueltasRestantes",
+          sortable: true,
+        },
+        {
           name: "Cantidad",
           align: "center",
           label: "Cantidad",
@@ -164,7 +181,6 @@ export default {
       end: "",
       search: "",
       nombreCliente: "",
-      nombreUsuario: "",
       fecha: "",
       precioServicio: 10,
       cantVueltas: 1,
@@ -173,7 +189,9 @@ export default {
       },
       cardCreate: false,
       rol: "Administrador",
-      index:""
+      username: "",
+      index: "",
+      temp: 0,
     });
 
     onMounted(() => {
@@ -184,46 +202,49 @@ export default {
       sendGetRequest();
     }, 1000);
 
-    function sendGetRequest(){
-        axios
-          .get("http://localhost:1337/api/ingresos", {
-            headers: {
-              Authorization: "Bearer " + store.state.jwt,
-            },
-          })
-          .then(function (response) {
-            data.rows=[]
-            for (let i = 0; i < response.data.data.length; i++) {
-              data.rows.push({
-                name: response.data.data[i].attributes.Fecha.split("-")
-                  .reverse()
-                  .join("-"),
-                NombreCliente: response.data.data[i].attributes.NombreCliente,
-                NombreTrabajador:
-                  response.data.data[i].attributes.NombreTrabajador,
-                Cantidad: response.data.data[i].attributes.Cantidad,
-                id: response.data.data[i].id,
-                category: "breakfast",
-              });
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+    function sendGetRequest() {
+      axios
+        .get("http://localhost:1337/api/ingresos", {
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          data.rows = [];
+          for (let i = 0; i < response.data.data.length; i++) {
+            data.rows.push({
+              name: response.data.data[i].id,
+              NombreCliente: response.data.data[i].attributes.NombreCliente,
+              NombreTrabajador:
+                response.data.data[i].attributes.NombreTrabajador,
+              Cantidad: response.data.data[i].attributes.Cantidad,
+              VueltasRestantes:
+                response.data.data[i].attributes.VueltasRestantes,
+              Fecha: response.data.data[i].attributes.Fecha.split("-")
+                .reverse()
+                .join("-"),
+              category: "breakfast",
+            });
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
 
-        axios
-          .get("http://localhost:1337/api/clientes/$", {
-            headers: {
-              Authorization: "Bearer " + store.state.jwt,
-            },
-          })
-          .then(function (response) {
-            data.rol = response.data.role.name;
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-    };
+      axios
+        .get("http://localhost:1337/api/clientes/$", {
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          data.username = response.data.username;
+          data.rol = response.data.role.name;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
 
     let filter = computed(() => {
       return {
@@ -246,7 +267,8 @@ export default {
           data: {
             Fecha: data.fecha,
             NombreCliente: data.nombreCliente,
-            NombreTrabajador: data.nombreUsuario,
+            NombreTrabajador: data.username,
+            VueltasRestantes: data.cantVueltas,
             Cantidad: data.cantVueltas * data.precioServicio,
           },
           headers: {
@@ -254,12 +276,19 @@ export default {
           },
         })
         .then(function (response) {
+          data.rows.forEach((element) => {
+            if (element.name > data.temp) {
+              data.temp = element.name;
+            }
+          });
+          console.log(data.temp);
           data.rows.push({
-            name: data.fecha.substring(0, 10).split("-").reverse().join("-"),
+            name: data.temp + 1,
+            Fecha: data.fecha.substring(0, 10).split("-").reverse().join("-"),
             NombreCliente: data.nombreCliente,
-            NombreTrabajador: data.nombreUsuario,
+            NombreTrabajador: data.username,
+            VueltasRestantes: data.cantVueltas,
             Cantidad: data.cantVueltas * data.precioServicio,
-            id: "",
             category: "breakfast",
           });
           data.cantVueltas = 1;
@@ -275,8 +304,8 @@ export default {
       var stopDate = moment(stopDate).format("DD-MM-YYYY");
       data.rows.forEach((element) => {
         if (
-          moment(element.name).format("MM-DD-YYYY") >= currentDate &&
-          moment(element.name).format("MM-DD-YYYY") <= stopDate
+          moment(element.Fecha).format("MM-DD-YYYY") >= currentDate &&
+          moment(element.Fecha).format("MM-DD-YYYY") <= stopDate
         ) {
           element.category = "breakfast";
         } else {
@@ -349,28 +378,28 @@ export default {
 
     function aumentarSaldo() {
       selected.value.forEach(function (item, index, array) {
-        data.rows.forEach(element => {
-          if(element.id===selected.value[index].id){
+        data.rows.forEach((element) => {
+          console.log(element);
+          if (element.name === selected.value[index].name) {
             axios
               .put(
-                `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
+                `http://localhost:1337/api/ingresos/${selected.value[index].name}`,
                 {
                   headers: {
                     Authorization: "Bearer " + store.state.jwt,
                   },
                   data: {
+                    VueltasRestantes:
+                      element.VueltasRestantes + data.cantVueltas,
                     Cantidad:
-                      element.Cantidad +
-                      data.precioServicio * data.cantVueltas,
+                      element.Cantidad + data.precioServicio * data.cantVueltas,
                   },
                 }
               )
-              .then(function (response) {
-              })
+              .then(function (response) {})
               .catch(function (error) {
                 console.log(error);
               });
-            
           }
         });
       });
@@ -378,29 +407,27 @@ export default {
 
     function disminuirSaldo() {
       selected.value.forEach(function (item, index, array) {
-        data.rows.forEach(element => {
-          if(element.id===selected.value[index].id){
-        axios
-          .put(
-            `http://localhost:1337/api/ingresos/${selected.value[index].id}`,
-            {
-              headers: {
-                Authorization: "Bearer " + store.state.jwt,
-              },
-              data: {
-                Cantidad:
-                  element.Cantidad -
-                  data.precioServicio * data.cantVueltas,
-              },
-            }
-          )
-          .then(function (response) {
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        data.rows.forEach((element) => {
+          if (element.name === selected.value[index].name) {
+            axios
+              .put(
+                `http://localhost:1337/api/ingresos/${selected.value[index].name}`,
+                {
+                  headers: {
+                    Authorization: "Bearer " + store.state.jwt,
+                  },
+                  data: {
+                    VueltasRestantes:
+                      element.VueltasRestantes - data.cantVueltas,
+                  },
+                }
+              )
+              .then(function (response) {})
+              .catch(function (error) {
+                console.log(error);
+              });
           }
-        })
+        });
       });
     }
 

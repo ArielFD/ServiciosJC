@@ -32,7 +32,7 @@ export default {
 
     async function sendMail() {
       await axios
-        .post("http://localhost:1337/api/auth/forgot-password", {
+        .post(process.env.VUE_APP_URL+"/api/auth/forgot-password", {
           email: data.email, // user's email
         })
         .then((response) => {

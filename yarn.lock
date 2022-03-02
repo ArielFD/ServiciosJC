@@ -5469,6 +5469,11 @@
   "resolved" "https://registry.npmjs.org/vary/-/vary-1.1.2.tgz"
   "version" "1.1.2"
 
+"vhost@^3.0.2":
+  "integrity" "sha1-L7HezUxGaqiLD5NBrzPcGv8keNU="
+  "resolved" "https://registry.npmjs.org/vhost/-/vhost-3.0.2.tgz"
+  "version" "3.0.2"
+
 "vue-loader@16.8.3":
   "integrity" "sha512-7vKN45IxsKxe5GcVCbc2qFU5aWzyiLrYJyUuMz4BQLKctCj/fmCa0w6fGiiQ2cLFetNcek1ppGJQDCup0c1hpA=="
   "resolved" "https://registry.npmjs.org/vue-loader/-/vue-loader-16.8.3.tgz"

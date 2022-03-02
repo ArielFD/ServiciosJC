@@ -80,7 +80,7 @@ export default {
     
         async function Login() {
           await axios
-            .post("http://localhost:1337/api/auth/local", {
+            .post(process.env.VUE_APP_URL+"/api/auth/local", {
               identifier: data.email,
               password: data.password,
             })

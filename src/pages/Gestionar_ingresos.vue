@@ -120,7 +120,7 @@ export default {
 
     onMounted(() => {
       axios
-        .get("http://localhost:1337/api/ingresos", {
+        .get(process.env.VUE_APP_URL+"/api/ingresos", {
           headers: {
             Authorization:
               "Bearer "+store.state.jwt,

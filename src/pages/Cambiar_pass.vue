@@ -67,7 +67,7 @@ export default {
 
     async function resetPass() {
       axios
-        .post("http://localhost:1337/api/auth/reset-password", {
+        .post(process.env.VUE_APP_URL+"/api/auth/reset-password", {
           code: route.query.code,
           password: data.newPass,
           passwordConfirmation: data.confirmationPass,

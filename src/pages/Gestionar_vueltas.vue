@@ -30,6 +30,7 @@
     <div class="row justify-center">
       <q-input
         v-model.number="data.cantVueltas"
+        min="0"
         type="number"
         filled
         class="col-6 q-ma-md"
@@ -204,14 +205,30 @@ export default {
 
     function sendGetRequest() {
       axios
-        .get("http://localhost:1337/api/ingresos", {
+        .get(process.env.VUE_APP_URL+"/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
+          data.username = response.data.username;
+          data.rol = response.data.role.name;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+
+      axios
+        .get(process.env.VUE_APP_URL+"/api/ingresos", {
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          console.log(data.rol);
           data.rows = [];
           for (let i = 0; i < response.data.data.length; i++) {
+            console.log(response.data.data[i].attributes.VueltasRestantes);
             data.rows.push({
               name: response.data.data[i].id,
               NombreCliente: response.data.data[i].attributes.NombreCliente,
@@ -225,21 +242,14 @@ export default {
                 .join("-"),
               category: "breakfast",
             });
+            if (
+              response.data.data[i].attributes.VueltasRestantes == 0 &&
+              data.rol == "Encargado"
+            ) {
+              console.log("true");
+              data.rows.pop();
+            }
           }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-
-      axios
-        .get("http://localhost:1337/api/clientes/$", {
-          headers: {
-            Authorization: "Bearer " + store.state.jwt,
-          },
-        })
-        .then(function (response) {
-          data.username = response.data.username;
-          data.rol = response.data.role.name;
         })
         .catch(function (error) {
           console.log(error);
@@ -256,6 +266,9 @@ export default {
     });
 
     let total = computed(() => {
+      if (data.cantVueltas < 0) {
+        data.cantVueltas = 0;
+      }
       return data.cantVueltas * data.precioServicio;
     });
 
@@ -263,7 +276,7 @@ export default {
       const d = new Date();
       data.fecha = d.toISOString();
       axios
-        .post("http://localhost:1337/api/ingresos", {
+        .post(process.env.VUE_APP_URL+"/api/ingresos", {
           data: {
             Fecha: data.fecha,
             NombreCliente: data.nombreCliente,
@@ -383,7 +396,7 @@ export default {
           if (element.name === selected.value[index].name) {
             axios
               .put(
-                `http://localhost:1337/api/ingresos/${selected.value[index].name}`,
+                process.env.VUE_APP_URL+`/api/ingresos/${selected.value[index].name}`,
                 {
                   headers: {
                     Authorization: "Bearer " + store.state.jwt,
@@ -403,32 +416,53 @@ export default {
           }
         });
       });
+      data.cantVueltas = 0;
     }
 
     function disminuirSaldo() {
       selected.value.forEach(function (item, index, array) {
         data.rows.forEach((element) => {
           if (element.name === selected.value[index].name) {
-            axios
-              .put(
-                `http://localhost:1337/api/ingresos/${selected.value[index].name}`,
-                {
-                  headers: {
-                    Authorization: "Bearer " + store.state.jwt,
-                  },
-                  data: {
-                    VueltasRestantes:
-                      element.VueltasRestantes - data.cantVueltas,
-                  },
-                }
-              )
-              .then(function (response) {})
-              .catch(function (error) {
-                console.log(error);
-              });
+            if (element.VueltasRestantes - data.cantVueltas < 0) {
+              axios
+                .put(
+                  process.env.VUE_APP_URL+`/api/ingresos/${selected.value[index].name}`,
+                  {
+                    headers: {
+                      Authorization: "Bearer " + store.state.jwt,
+                    },
+                    data: {
+                      VueltasRestantes: 0,
+                    },
+                  }
+                )
+                .then(function (response) {})
+                .catch(function (error) {
+                  console.log(error);
+                });
+            } else {
+              axios
+                .put(
+                  process.env.VUE_APP_URL+`/api/ingresos/${selected.value[index].name}`,
+                  {
+                    headers: {
+                      Authorization: "Bearer " + store.state.jwt,
+                    },
+                    data: {
+                      VueltasRestantes:
+                        element.VueltasRestantes - data.cantVueltas,
+                    },
+                  }
+                )
+                .then(function (response) {})
+                .catch(function (error) {
+                  console.log(error);
+                });
+            }
           }
         });
       });
+      data.cantVueltas = 0;
     }
 
     return {

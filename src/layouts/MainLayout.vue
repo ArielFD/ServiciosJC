@@ -33,8 +33,8 @@
       <div class="row justify-center">
         <q-img
           src="~assets/Simpal.png"
-          
-          width="360px"
+          width='50%'
+          max-width="360px"
         />
       </div>
       <router-view />
@@ -138,7 +138,7 @@ export default defineComponent({
       console.log("update");
       console.log(router.currentRoute.value.path);
       axios
-        .get("http://localhost:1337/api/clientes/$", {
+        .get(process.env.VUE_APP_URL+"/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -206,7 +206,7 @@ export default defineComponent({
     const sendGetRequest = async () => {
       try {
         const resp = await axios
-          .get("http://localhost:1337/api/clientes/$", {
+          .get(process.env.VUE_APP_URL+"/api/clientes/$", {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
             },

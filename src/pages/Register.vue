@@ -67,7 +67,7 @@ export default {
 
     async function register() {
       await axios
-        .post("http://localhost:1337/api/auth/local/register", {
+        .post(process.env.VUE_APP_URL+"/api/auth/local/register", {
           username: data.username,
           email: data.email,
           password: data.password,
@@ -75,7 +75,7 @@ export default {
         .then((response) => {
           console.log("User profile", response.data.user);
           axios
-            .post(`http://localhost:1337/api/auth/send-email-confirmation`, {
+            .post(process.env.VUE_APP_URL+"/api/auth/send-email-confirmation", {
               email: response.data.user.email, // user's email
             })
             .then((response) => {

@@ -151,7 +151,7 @@ export default {
 
     onMounted(() => {
       axios
-        .get("http://localhost:1337/api/clientes/$", {
+        .get(process.env.VUE_APP_URL+"/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -175,7 +175,7 @@ export default {
 
     function Edit(params) {
       axios
-        .put(`http://localhost:1337/api/users/${data.id}`, {
+        .put(process.env.VUE_APP_URL+`/api/users/${data.id}`, {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -200,7 +200,7 @@ export default {
     async function sendMail() {
       data.cardPass = true;
       await axios
-        .post("http://localhost:1337/api/auth/forgot-password", {
+        .post(process.env.VUE_APP_URL+"/api/auth/forgot-password", {
           email: data.email, // user's email
         })
         .then((response) => {
@@ -208,7 +208,7 @@ export default {
           store.state.alerts[1].message = "Enviado email de confirmacion!";
           $q.notify(store.state.alerts[1]);
           axios
-            .get("http://localhost:1337/api/clientes/$", {
+            .get(process.env.VUE_APP_URL+"/api/clientes/$", {
               headers: {
                 Authorization: "Bearer " + store.state.jwt,
               },
@@ -231,7 +231,7 @@ export default {
 
     async function resetPass() {
       axios
-        .post("http://localhost:1337/api/auth/reset-password", {
+        .post(process.env.VUE_APP_URL+"/api/auth/reset-password", {
           code: data.token,
           password: data.newPass,
           passwordConfirmation: data.newPass,

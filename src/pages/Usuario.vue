@@ -50,7 +50,7 @@ export default {
     const sendGetRequest = async () => {
       try {
         const resp = await axios
-          .get("http://localhost:1337/api/servicios", {
+          .get(process.env.VUE_APP_URL+"/api/servicios", {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
             },

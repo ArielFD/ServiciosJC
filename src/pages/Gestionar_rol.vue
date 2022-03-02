@@ -168,7 +168,7 @@ export default {
 
     onMounted(() => {
       axios
-        .get("http://localhost:1337/api/users-permissions/roles", {
+        .get(process.env.VUE_APP_URL+"/api/users-permissions/roles", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -198,7 +198,7 @@ export default {
 
     function Create() {
       axios
-        .post("http://localhost:1337/api/users-permissions/roles", {
+        .post(process.env.VUE_APP_URL+"/api/users-permissions/roles", {
           name: data.nameRol,
           description: data.descriptionRol,
           headers: {
@@ -222,7 +222,7 @@ export default {
     function Delete(params) {
       axios
         .delete(
-          `http://localhost:1337/api/users-permissions/roles/${selected.value[0].id}`,
+          process.env.VUE_APP_URL+`/api/users-permissions/roles/${selected.value[0].id}`,
           {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
@@ -244,7 +244,7 @@ export default {
     function Edit(params) {
       axios
         .put(
-          `http://localhost:1337/api/users-permissions/roles/${selected.value[0].id}`,
+          process.env.VUE_APP_URL+`/api/users-permissions/roles/${selected.value[0].id}`,
           {
             headers: {
               Authorization: "Bearer " + store.state.jwt,

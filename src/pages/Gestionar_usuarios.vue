@@ -410,7 +410,7 @@ export default {
 
     onMounted(() => {
       axios
-        .get("http://localhost:1337/api/clientes", {
+        .get(process.env.VUE_APP_URL+"/api/clientes", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -439,7 +439,7 @@ export default {
         });
 
       axios
-        .get("http://localhost:1337/api/users-permissions/roles", {
+        .get(process.env.VUE_APP_URL+"/api/users-permissions/roles", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -463,7 +463,7 @@ export default {
       data.cardPass = true;
       console.log(data.emailedit);
       await axios
-        .post("http://localhost:1337/api/auth/forgot-password", {
+        .post(process.env.VUE_APP_URL+"/api/auth/forgot-password", {
           email: data.emailedit, // user's email
         })
         .then((response) => {
@@ -471,7 +471,7 @@ export default {
           store.state.alerts[1].message = "Enviado email de confirmacion!";
           $q.notify(store.state.alerts[1]);
           axios
-            .get("http://localhost:1337/api/clientes", {
+            .get(process.env.VUE_APP_URL+"/api/clientes", {
               headers: {
                 Authorization: "Bearer " + store.state.jwt,
               },
@@ -498,7 +498,7 @@ export default {
 
     async function resetPass() {
       axios
-        .post("http://localhost:1337/api/auth/reset-password", {
+        .post(process.env.VUE_APP_URL+"/api/auth/reset-password", {
           code: data.token,
           password: data.newPass,
           passwordConfirmation: data.newPass,
@@ -537,7 +537,7 @@ export default {
         }
       });
       axios
-        .post("http://localhost:1337/api/users", {
+        .post(process.env.VUE_APP_URL+"/api/users", {
           email: data.email,
           username: data.username,
           password: data.password,
@@ -578,7 +578,7 @@ export default {
 
     function Delete(params) {
       axios
-        .delete(`http://localhost:1337/api/users/${selected.value[0].id}`, {
+        .delete(process.env.VUE_APP_URL+`/api/users/${selected.value[0].id}`, {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -602,7 +602,7 @@ export default {
         }
       });
       axios
-        .put(`http://localhost:1337/api/users/${selected.value[0].id}`, {
+        .put(process.env.VUE_APP_URL+`/api/users/${selected.value[0].id}`, {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },

@@ -58,7 +58,7 @@ import { ref, inject, computed, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { useQuasar } from 'quasar'
-
+import { api } from 'boot/axios.js'
 
 export default {
   name: "Login",
@@ -67,7 +67,6 @@ export default {
     const router = useRouter();
     const route = useRoute();
     const $q = useQuasar() 
-
     const nameRef = ref(null)
 
     let data = reactive({
@@ -79,8 +78,8 @@ export default {
 
     
         async function Login() {
-          await axios
-            .post(process.env.VUE_APP_URL+"/api/auth/local", {
+          await api
+            .post("/api/auth/local", {
               identifier: data.email,
               password: data.password,
             })

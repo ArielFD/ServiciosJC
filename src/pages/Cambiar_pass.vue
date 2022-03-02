@@ -46,6 +46,7 @@
 <script>
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, reactive } from "vue";
+import { api } from 'boot/axios.js'
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 
@@ -66,8 +67,8 @@ export default {
     });
 
     async function resetPass() {
-      axios
-        .post(process.env.VUE_APP_URL+"/api/auth/reset-password", {
+      api
+        .post("/api/auth/reset-password", {
           code: route.query.code,
           password: data.newPass,
           passwordConfirmation: data.confirmationPass,

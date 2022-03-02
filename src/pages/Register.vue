@@ -50,6 +50,7 @@ import { ref, inject, computed, reactive } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import { useQuasar } from "quasar";
+import { api } from 'boot/axios.js'
 
 export default {
   setup() {
@@ -66,16 +67,16 @@ export default {
     });
 
     async function register() {
-      await axios
-        .post(process.env.VUE_APP_URL+"/api/auth/local/register", {
+      await api
+        .post("/api/auth/local/register", {
           username: data.username,
           email: data.email,
           password: data.password,
         })
         .then((response) => {
           console.log("User profile", response.data.user);
-          axios
-            .post(process.env.VUE_APP_URL+"/api/auth/send-email-confirmation", {
+          api
+            .post("/api/auth/send-email-confirmation", {
               email: response.data.user.email, // user's email
             })
             .then((response) => {

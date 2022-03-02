@@ -17,6 +17,7 @@
 import { defineComponent, ref, reactive,inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import { useQuasar } from 'quasar'
 
 export default {
@@ -31,8 +32,8 @@ export default {
     });
 
     async function sendMail() {
-      await axios
-        .post(process.env.VUE_APP_URL+"/api/auth/forgot-password", {
+      await api
+        .post("/api/auth/forgot-password", {
           email: data.email, // user's email
         })
         .then((response) => {

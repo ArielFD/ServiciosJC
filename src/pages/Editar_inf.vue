@@ -122,6 +122,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import { useRouter, useRoute } from "vue-router";
 import { Dialog } from "quasar";
 import { useQuasar } from "quasar";
@@ -150,8 +151,8 @@ export default {
     });
 
     onMounted(() => {
-      axios
-        .get(process.env.VUE_APP_URL+"/api/clientes/$", {
+      api
+        .get("/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -174,8 +175,8 @@ export default {
     });
 
     function Edit(params) {
-      axios
-        .put(process.env.VUE_APP_URL+`/api/users/${data.id}`, {
+      api
+        .put(`/api/users/${data.id}`, {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -199,16 +200,16 @@ export default {
 
     async function sendMail() {
       data.cardPass = true;
-      await axios
-        .post(process.env.VUE_APP_URL+"/api/auth/forgot-password", {
+      await api
+        .post("/api/auth/forgot-password", {
           email: data.email, // user's email
         })
         .then((response) => {
           console.log("Your user received an email");
           store.state.alerts[1].message = "Enviado email de confirmacion!";
           $q.notify(store.state.alerts[1]);
-          axios
-            .get(process.env.VUE_APP_URL+"/api/clientes/$", {
+          api
+            .get("/api/clientes/$", {
               headers: {
                 Authorization: "Bearer " + store.state.jwt,
               },
@@ -230,8 +231,8 @@ export default {
     }
 
     async function resetPass() {
-      axios
-        .post(process.env.VUE_APP_URL+"/api/auth/reset-password", {
+      api
+        .post("/api/auth/reset-password", {
           code: data.token,
           password: data.newPass,
           passwordConfirmation: data.newPass,

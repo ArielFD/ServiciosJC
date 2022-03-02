@@ -290,6 +290,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import { Dialog } from "quasar";
 import { useQuasar } from "quasar";
 
@@ -409,8 +410,8 @@ export default {
     });
 
     onMounted(() => {
-      axios
-        .get(process.env.VUE_APP_URL+"/api/clientes", {
+      api
+        .get("/api/clientes", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -438,8 +439,8 @@ export default {
           console.log(error);
         });
 
-      axios
-        .get(process.env.VUE_APP_URL+"/api/users-permissions/roles", {
+      api
+        .get("/api/users-permissions/roles", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -462,16 +463,16 @@ export default {
     async function sendMail() {
       data.cardPass = true;
       console.log(data.emailedit);
-      await axios
-        .post(process.env.VUE_APP_URL+"/api/auth/forgot-password", {
+      await api
+        .post("/api/auth/forgot-password", {
           email: data.emailedit, // user's email
         })
         .then((response) => {
           console.log("Your user received an email");
           store.state.alerts[1].message = "Enviado email de confirmacion!";
           $q.notify(store.state.alerts[1]);
-          axios
-            .get(process.env.VUE_APP_URL+"/api/clientes", {
+          api
+            .get("/api/clientes", {
               headers: {
                 Authorization: "Bearer " + store.state.jwt,
               },
@@ -497,8 +498,8 @@ export default {
     }
 
     async function resetPass() {
-      axios
-        .post(process.env.VUE_APP_URL+"/api/auth/reset-password", {
+      api
+        .post("/api/auth/reset-password", {
           code: data.token,
           password: data.newPass,
           passwordConfirmation: data.newPass,
@@ -536,8 +537,8 @@ export default {
           data.rolId = element.id;
         }
       });
-      axios
-        .post(process.env.VUE_APP_URL+"/api/users", {
+      api
+        .post("/api/users", {
           email: data.email,
           username: data.username,
           password: data.password,
@@ -577,8 +578,8 @@ export default {
     }
 
     function Delete(params) {
-      axios
-        .delete(process.env.VUE_APP_URL+`/api/users/${selected.value[0].id}`, {
+      api
+        .delete(`/api/users/${selected.value[0].id}`, {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -601,8 +602,8 @@ export default {
           data.rolIdedit = element.id;
         }
       });
-      axios
-        .put(process.env.VUE_APP_URL+`/api/users/${selected.value[0].id}`, {
+      api
+        .put(`/api/users/${selected.value[0].id}`, {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },

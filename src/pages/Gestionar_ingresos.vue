@@ -61,6 +61,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive,watch } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import moment from "moment";
 import { Dialog } from "quasar";
 
@@ -119,8 +120,8 @@ export default {
     });
 
     onMounted(() => {
-      axios
-        .get(process.env.VUE_APP_URL+"/api/ingresos", {
+      api
+        .get("/api/ingresos", {
           headers: {
             Authorization:
               "Bearer "+store.state.jwt,

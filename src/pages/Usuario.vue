@@ -16,6 +16,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 
 export default {
   setup() {
@@ -49,8 +50,8 @@ export default {
 
     const sendGetRequest = async () => {
       try {
-        const resp = await axios
-          .get(process.env.VUE_APP_URL+"/api/servicios", {
+        const resp = await api
+          .get("/api/servicios", {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
             },

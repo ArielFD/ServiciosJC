@@ -126,6 +126,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import { Dialog } from "quasar";
 
 export default {
@@ -167,8 +168,8 @@ export default {
     });
 
     onMounted(() => {
-      axios
-        .get(process.env.VUE_APP_URL+"/api/users-permissions/roles", {
+      api
+        .get("/api/users-permissions/roles", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -197,8 +198,8 @@ export default {
     }
 
     function Create() {
-      axios
-        .post(process.env.VUE_APP_URL+"/api/users-permissions/roles", {
+      api
+        .post("/api/users-permissions/roles", {
           name: data.nameRol,
           description: data.descriptionRol,
           headers: {
@@ -220,9 +221,8 @@ export default {
     }
 
     function Delete(params) {
-      axios
-        .delete(
-          process.env.VUE_APP_URL+`/api/users-permissions/roles/${selected.value[0].id}`,
+      api
+        .delete(`/api/users-permissions/roles/${selected.value[0].id}`,
           {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
@@ -242,9 +242,8 @@ export default {
     }
 
     function Edit(params) {
-      axios
-        .put(
-          process.env.VUE_APP_URL+`/api/users-permissions/roles/${selected.value[0].id}`,
+      api
+        .put(`/api/users-permissions/roles/${selected.value[0].id}`,
           {
             headers: {
               Authorization: "Bearer " + store.state.jwt,

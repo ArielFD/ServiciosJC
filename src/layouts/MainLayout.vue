@@ -105,6 +105,7 @@ const linksListEncCaj = [
 import { defineComponent, ref, reactive, computed, watch } from "vue";
 import { onMounted, onUpdated, onUnmounted, inject } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import { useRouter, useRoute } from "vue-router";
 
 export default defineComponent({
@@ -137,8 +138,8 @@ export default defineComponent({
     onUpdated(() => {
       console.log("update");
       console.log(router.currentRoute.value.path);
-      axios
-        .get(process.env.VUE_APP_URL+"/api/clientes/$", {
+      api
+        .get("/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -205,8 +206,8 @@ export default defineComponent({
 
     const sendGetRequest = async () => {
       try {
-        const resp = await axios
-          .get(process.env.VUE_APP_URL+"/api/clientes/$", {
+        const resp = await api
+          .get("/api/clientes/$", {
             headers: {
               Authorization: "Bearer " + store.state.jwt,
             },

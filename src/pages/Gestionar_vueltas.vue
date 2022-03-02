@@ -122,6 +122,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
+import { api } from 'boot/axios.js'
 import moment from "moment";
 import { getCurrentInstance } from "vue";
 const instance = getCurrentInstance();
@@ -204,8 +205,8 @@ export default {
     }, 1000);
 
     function sendGetRequest() {
-      axios
-        .get(process.env.VUE_APP_URL+"/api/clientes/$", {
+      api
+        .get("/api/clientes/$", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -218,8 +219,8 @@ export default {
           console.log(error);
         });
 
-      axios
-        .get(process.env.VUE_APP_URL+"/api/ingresos", {
+      api
+        .get("/api/ingresos", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
@@ -275,8 +276,8 @@ export default {
     function Create() {
       const d = new Date();
       data.fecha = d.toISOString();
-      axios
-        .post(process.env.VUE_APP_URL+"/api/ingresos", {
+      api
+        .post("/api/ingresos", {
           data: {
             Fecha: data.fecha,
             NombreCliente: data.nombreCliente,
@@ -394,9 +395,9 @@ export default {
         data.rows.forEach((element) => {
           console.log(element);
           if (element.name === selected.value[index].name) {
-            axios
+            api
               .put(
-                process.env.VUE_APP_URL+`/api/ingresos/${selected.value[index].name}`,
+                `/api/ingresos/${selected.value[index].name}`,
                 {
                   headers: {
                     Authorization: "Bearer " + store.state.jwt,
@@ -424,9 +425,9 @@ export default {
         data.rows.forEach((element) => {
           if (element.name === selected.value[index].name) {
             if (element.VueltasRestantes - data.cantVueltas < 0) {
-              axios
+              api
                 .put(
-                  process.env.VUE_APP_URL+`/api/ingresos/${selected.value[index].name}`,
+                  `/api/ingresos/${selected.value[index].name}`,
                   {
                     headers: {
                       Authorization: "Bearer " + store.state.jwt,
@@ -441,9 +442,9 @@ export default {
                   console.log(error);
                 });
             } else {
-              axios
+              api
                 .put(
-                  process.env.VUE_APP_URL+`/api/ingresos/${selected.value[index].name}`,
+                  `/api/ingresos/${selected.value[index].name}`,
                   {
                     headers: {
                       Authorization: "Bearer " + store.state.jwt,

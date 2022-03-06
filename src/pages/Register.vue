@@ -74,13 +74,12 @@ export default {
           password: data.password,
         })
         .then((response) => {
-          console.log("User profile", response.data.user);
           api
             .post("/api/auth/send-email-confirmation", {
               email: response.data.user.email, // user's email
             })
             .then((response) => {
-              console.log("Your user received an email");
+              console.log("Your user received an email",response);
               store.state.alerts[1].message =
                 "Se le ha enviado un email de confirmacion!";
               $q.notify(store.state.alerts[1]);
@@ -97,7 +96,6 @@ export default {
           if(error.response.data.error.details.errors!=null){
           error.response.data.error.details.errors.forEach(element => {
             store.state.errors=store.state.errors+", "+element.message
-            console.log(store.state.errors);
           });
           }else{
             store.state.errors=store.state.errors+", "+error.response.data.error.message
@@ -109,21 +107,6 @@ export default {
     }
 
     function onSubmit() {
-      // if (data.nameRef="") {
-      //   // form has error
-      //   $q.notify({
-      //     icon: 'done',
-      //     color: 'positive',
-      //     message: 'Submitted'
-      //   })
-      // }
-      // else {
-      //   $q.notify({
-      //     icon: 'done',
-      //     color: 'positive',
-      //     message: 'Submitted'
-      //   })
-      // }
     }
 
     return {

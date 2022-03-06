@@ -57,7 +57,6 @@ export default {
             },
           })
           .then(function (response) {
-            console.log(response.data.data.length);
             for (let i = 0; i < response.data.data.length; i++) {
               data.rows.push({
                 name: response.data.data[i].attributes.NombreServicio,

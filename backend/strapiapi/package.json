@@ -21,6 +21,7 @@
     "nodemailer": "^6.7.2",
     "pg": "8.6.0",
     "sendmail": "^1.6.1",
+    "socket.io": "^4.4.1",
     "strapi-provider-email-sendgrid": "^3.6.8"
   },
   "author": "A Strapi developer",
@@ -32,5 +33,6 @@
     "npm": ">=6.0.0"
   },
   "license": "MIT",
-  "main": "index.js"
+  "main": "index.js",
+  "devDependencies": {}
 }

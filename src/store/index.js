@@ -2,7 +2,8 @@ import { reactive } from "vue";
 import axios from "axios";
 
 const state = reactive({
-  jwt: "",
+  jwt: null,
+  user: null,
   errors: "",
   alerts: [
     { color: "negative", message: "", icon: "error" },
@@ -11,7 +12,7 @@ const state = reactive({
   ],
   emailRules: [(val) => (val && val.length > 0) || "Please type something"],
   inputRules: [(val) => (val && val.length > 0) || "Please type something"],
-  inputTelephone: [(val) => (val && val.length==8) || "Incorrect tele"],
+  inputTelephone: [(val) => (val && val.length == 8) || "Incorrect tele"],
   ageRules: [(val) => (val > 0 && val < 100) || "Edad Incorrecta"],
   passRules: [],
   carnetID: [
@@ -28,38 +29,6 @@ const state = reactive({
       val.substring(4, 5) >= 1 ||
       val.substring(4, 5) <= 31 ||
       "CI Incorrecto dia",
-  ],
-  linksListAdmin: [
-    {
-      title: "Editar Informacion",
-      caption: "Editar Informacion",
-      icon: "settings",
-      link: "/editarinf",
-    },
-    {
-      title: "Gestionar vueltas",
-      caption: "Gestionar vueltas",
-      icon: "cached",
-      link: "/Gestionar_Vueltas",
-    },
-    {
-      title: "Gestionar Ingresos",
-      caption: "Gestionar Ingresos",
-      icon: "paid",
-      link: "/Gestionar_Ingresos",
-    },
-    {
-      title: "Gestionar Roles",
-      caption: "Gestionar Roles",
-      icon: "supervisor_account",
-      link: "/Gestionar_Roles",
-    },
-    {
-      title: "Gestionar Clientes",
-      caption: "Gestionar Clientes",
-      icon: "group_add",
-      link: "/Gestionar_Usuarios",
-    },
   ],
 });
 
@@ -86,6 +55,23 @@ const methods = {
       val.toString().substring(4, 6) > 31
     ) {
       return "CI Incorrecto longitud dias";
+    }
+  },
+
+  getToken() {
+    if (localStorage.getItem("jwt")) {
+      state.jwt = localStorage.getItem("jwt");
+    } else {
+      state.jwt = null;
+    }
+    return state.jwt
+  },
+
+  getUser() {
+    if (localStorage.getItem("userData")) {
+      state.user = localStorage.getItem("userData");
+    } else {
+      state.user = null;
     }
   },
 };

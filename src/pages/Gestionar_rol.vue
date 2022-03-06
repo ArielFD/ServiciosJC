@@ -175,7 +175,6 @@ export default {
           },
         })
         .then(function (response) {
-          console.log(response.data.roles[0].description);
           for (let i = 0; i < response.data.roles.length; i++) {
             data.rows.push({
               name: response.data.roles[i].name,
@@ -184,7 +183,6 @@ export default {
               category: "breakfast",
             });
           }
-          console.log(data.rows);
         })
         .catch(function (error) {
           console.log(error);

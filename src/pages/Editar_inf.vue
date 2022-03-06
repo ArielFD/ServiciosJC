@@ -205,7 +205,7 @@ export default {
           email: data.email, // user's email
         })
         .then((response) => {
-          console.log("Your user received an email");
+          console.log(response);
           store.state.alerts[1].message = "Enviado email de confirmacion!";
           $q.notify(store.state.alerts[1]);
           api
@@ -238,7 +238,7 @@ export default {
           passwordConfirmation: data.newPass,
         })
         .then((response) => {
-          console.log("Your user's password has been reset.");
+          console.log(response);
           store.state.alerts[1].message = "Password Reiniciado!";
           $q.notify(store.state.alerts[1]);
         })

@@ -432,7 +432,6 @@ export default {
               id: response.data[i].id,
               category: "breakfast",
             });
-            console.log(data.rows);
           }
         })
         .catch(function (error) {
@@ -453,7 +452,6 @@ export default {
               id: element.id,
             });
           });
-          console.log(data.options);
         })
         .catch(function (error) {
           console.log(error);
@@ -462,13 +460,12 @@ export default {
 
     async function sendMail() {
       data.cardPass = true;
-      console.log(data.emailedit);
       await api
         .post("/api/auth/forgot-password", {
           email: data.emailedit, // user's email
         })
         .then((response) => {
-          console.log("Your user received an email");
+          console.log("Your user received an email",response);
           store.state.alerts[1].message = "Enviado email de confirmacion!";
           $q.notify(store.state.alerts[1]);
           api
@@ -505,7 +502,7 @@ export default {
           passwordConfirmation: data.newPass,
         })
         .then((response) => {
-          console.log("Your user's password has been reset.");
+          console.log("Your user's password has been reset.",response);
           store.state.alerts[1].message = "Password Reiniciado!";
           $q.notify(store.state.alerts[1]);
         })
@@ -530,8 +527,6 @@ export default {
     }
 
     function Create() {
-      console.log(data.options);
-      console.log(data.rol);
       data.options.forEach((element) => {
         if (data.rol == element.name) {
           data.rolId = element.id;

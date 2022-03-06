@@ -121,7 +121,7 @@ export default {
 
     onMounted(() => {
       api
-        .get("/api/ingresos", {
+        .get("/api/ingresos?sort[0]=id%3Adesc", {
           headers: {
             Authorization:
               "Bearer "+store.state.jwt,
@@ -154,8 +154,6 @@ export default {
       return {
         search: data.search,
         breakfast: data.filterToggle.breakfast,
-        // lunch: data.filterToggle.lunch,
-        // dinner: data.filterToggle.dinner,
       };
     });
 
@@ -177,7 +175,6 @@ export default {
         arr[0]=arr[1]
         arr[1]=temp
         arr.join("-")
-        console.log(moment(arr.join("-")));
         if (
           moment(arr.join("-")).format("DD-MM-YYYY") >= currentDate &&
           moment(arr.join("-")).format("DD-MM-YYYY") <= stopDate
@@ -212,8 +209,6 @@ export default {
     }
 
     function customFilter(rows, terms) {
-      // rows contain the entire data
-      // terms contains whatever you have as filter
 
       const lowerSearch = terms.search ? terms.search.toLowerCase() : "";
 
@@ -221,15 +216,8 @@ export default {
         let ans = false;
         //Gather toggle conditions
         let c1 = data.filterToggle.breakfast && row.category == "breakfast";
-        // let c2 = data.filterToggle.lunch && row.category == "lunch"
-        // let c3 = data.filterToggle.dinner && row.category == "dinner"
-
-        //Gather search condition
-
-        //Assume true in case there is no search
         let s1 = true;
 
-        //If search term exists, convert to lower case and see which rows contain it
         if (lowerSearch != "") {
           s1 = false;
           //Get the values

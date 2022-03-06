@@ -21,10 +21,18 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent ,inject} from 'vue'
+import { useRouter, useRoute } from "vue-router";
 
 export default defineComponent({
   name: 'EssentialLink',
+
+  setup() {
+
+    return {
+    }
+  },
+
   props: {
     title: {
       type: String,

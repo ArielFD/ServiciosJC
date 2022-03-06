@@ -57,10 +57,6 @@ export default {
     const route = useRoute();
     const store = inject("store");
     const $q = useQuasar() 
-
-    onMounted(() => {
-      console.log(route.query);
-    });
     
     let data = reactive({
       isPwd: true,
@@ -77,7 +73,7 @@ export default {
           "passwordConfirmation": data.confirmationPass,
         })
         .then((response) => {
-          console.log("Your user's password has been reset.");
+          console.log("Your user's password has been reset.",response);
           store.state.alerts[1].message="Password Reiniciado!"
           $q.notify(store.state.alerts[1])
           router.push("/");

@@ -17,7 +17,7 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
+    <q-drawer v-model="leftDrawerOpen" show-if-above v-if="data.drawer">
       <q-list>
         <q-item-label header> Preferencias </q-item-label>
 
@@ -30,14 +30,10 @@
     </q-drawer>
 
     <q-page-container class="contenedor q-pa-md q-mt-md">
-      <div class="row justify-center">
-        <q-img
-          src="~assets/Simpal.png"
-          width='50%'
-          max-width="360px"
-        />
+      <div class="row justify-center q-mb-md">
+        <q-img src="~assets/Simpal.png" width="50%" style="max-width: 300px" />
       </div>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>
@@ -46,6 +42,12 @@
 import EssentialLink from "components/EssentialLink.vue";
 
 const linksListAdmin = [
+  {
+    title: "Cerrar Sesion",
+    caption: "Cerrar Sesion",
+    icon: "cancel",
+    link: "/",
+  },
   {
     title: "Editar Informacion",
     caption: "Editar Informacion",
@@ -80,14 +82,26 @@ const linksListAdmin = [
 
 const linksListAuth = [
   {
+    title: "Cerrar Sesion",
+    caption: "Cerrar Sesion",
+    icon: "cancel",
+    link: "/",
+  },
+  {
     title: "Editar Informacion",
     caption: "Editar Informacion",
     icon: "settings",
     link: "/editarinf",
-  }
+  },
 ];
 
 const linksListEncCaj = [
+  {
+    title: "Cerrar Sesion",
+    caption: "Cerrar Sesion",
+    icon: "cancel",
+    link: "/",
+  },
   {
     title: "Editar Informacion",
     caption: "Editar Informacion",
@@ -105,7 +119,7 @@ const linksListEncCaj = [
 import { defineComponent, ref, reactive, computed, watch } from "vue";
 import { onMounted, onUpdated, onUnmounted, inject } from "vue";
 import axios from "axios";
-import { api } from 'boot/axios.js'
+import { api } from "boot/axios.js";
 import { useRouter, useRoute } from "vue-router";
 
 export default defineComponent({
@@ -120,24 +134,15 @@ export default defineComponent({
     const route = useRoute();
     const store = inject("store");
     const leftDrawerOpen = ref(false);
+
     let data = reactive({
-      linkslist: [
-        {
-          title: "Cerrar Sesion",
-          caption: "Cerrar Sesion",
-          icon: "cancel",
-          link: "/",
-        },
-      ],
+      linkslist: [],
       jwt: store.state.jwt,
+      drawer: false,
     });
     // + store.state.jwt,
+
     onMounted(() => {
-      console.log("mounted");
-    });
-    onUpdated(() => {
-      console.log("update");
-      console.log(router.currentRoute.value.path);
       api
         .get("/api/clientes/$", {
           headers: {
@@ -145,9 +150,12 @@ export default defineComponent({
           },
         })
         .then(function (response) {
-          console.log("respuesta",response);
-          if (response.data.role.id === 3 && router.currentRoute.value.matched[1].path!="/") {
-            console.log("id1",router.currentRoute.value);
+          console.log(response);
+          if (
+            response.data.role.id === 3 &&
+            router.currentRoute.value.matched[1].path != "/"
+          ) {
+            data.drawer = true;
             linksListAdmin.forEach((element) => {
               data.linkslist.unshift({
                 title: element.title,
@@ -156,9 +164,12 @@ export default defineComponent({
                 link: element.link,
               });
             });
-            if (data.linkslist.length > 6) data.linkslist.splice(0, 5);
-          } else if (response.data.role.id === 1 && router.currentRoute.value.matched[1].path!="/") {
-            console.log("id2",response.data.role.id);
+            if (data.linkslist.length > 7) data.linkslist.splice(0, 6);
+          } else if (
+            response.data.role.id === 1 &&
+            router.currentRoute.value.matched[1].path != "/"
+          ) {
+            data.drawer = true;
             linksListAuth.forEach((element) => {
               data.linkslist.unshift({
                 title: element.title,
@@ -167,9 +178,13 @@ export default defineComponent({
                 link: element.link,
               });
             });
-            if (data.linkslist.length > 2) data.linkslist.splice(0, 1);
-          }else if (response.data.role.id === 16 ||  response.data.role.id === 17 && router.currentRoute.value.matched[1].path!="/") {
-            console.log("id2",response.data.role.id);
+            if (data.linkslist.length > 3) data.linkslist.splice(0, 2);
+          } else if (
+            response.data.role.id === 16 ||
+            (response.data.role.id === 17 &&
+              router.currentRoute.value.matched[1].path != "/")
+          ) {
+            data.drawer = true;
             linksListEncCaj.forEach((element) => {
               data.linkslist.unshift({
                 title: element.title,
@@ -178,31 +193,89 @@ export default defineComponent({
                 link: element.link,
               });
             });
-            if (data.linkslist.length > 3) data.linkslist.splice(0, 2);
-          }
-           else if (router.currentRoute.value.matched[1].path == "/") {
-            data.linkslist.splice(0, data.linkslist.length-1);
-            
+            if (data.linkslist.length > 4) data.linkslist.splice(0, 3);
+          } else if (router.currentRoute.value.matched[1].path == "/") {
+            data.linkslist.splice(0, data.linkslist.length);
+            localStorage.removeItem("jwt");
+            store.state.jwt = null;
+            if (store.state.user.rememberMe == false) {
+              localStorage.removeItem("userData");
+              store.state.user = null;
+            }
+            data.drawer = false;
           }
         })
         .catch(function (error) {
           console.log(error);
         });
     });
-    onUnmounted(() => {
-      console.log("unmounted");
+    onUpdated(() => {
+      api
+        .get("/api/clientes/$", {
+          headers: {
+            Authorization: "Bearer " + store.state.jwt,
+          },
+        })
+        .then(function (response) {
+          console.log(response);
+          if (
+            response.data.role.id === 3 &&
+            router.currentRoute.value.matched[1].path != "/"
+          ) {
+            data.drawer = true;
+            linksListAdmin.forEach((element) => {
+              data.linkslist.unshift({
+                title: element.title,
+                caption: element.caption,
+                icon: element.icon,
+                link: element.link,
+              });
+            });
+            if (data.linkslist.length > 7) data.linkslist.splice(0, 6);
+          } else if (
+            response.data.role.id === 1 &&
+            router.currentRoute.value.matched[1].path != "/"
+          ) {
+            data.drawer = true;
+            linksListAuth.forEach((element) => {
+              data.linkslist.unshift({
+                title: element.title,
+                caption: element.caption,
+                icon: element.icon,
+                link: element.link,
+              });
+            });
+            if (data.linkslist.length > 3) data.linkslist.splice(0, 2);
+          } else if (
+            response.data.role.id === 16 ||
+            (response.data.role.id === 17 &&
+              router.currentRoute.value.matched[1].path != "/")
+          ) {
+            data.drawer = true;
+            linksListEncCaj.forEach((element) => {
+              data.linkslist.unshift({
+                title: element.title,
+                caption: element.caption,
+                icon: element.icon,
+                link: element.link,
+              });
+            });
+            if (data.linkslist.length > 4) data.linkslist.splice(0, 3);
+          } else if (router.currentRoute.value.matched[1].path == "/") {
+            data.linkslist.splice(0, data.linkslist.length);
+            localStorage.removeItem("jwt");
+            store.state.jwt = null;
+            if (store.state.user.rememberMe == false) {
+              localStorage.removeItem("userData");
+              store.state.user = null;
+            }
+            data.drawer = false;
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     });
-    // let filter = computed(() => {
-    //   return {
-    //     list:data.linkslist
-    //     // lunch: data.filterToggle.lunch,
-    //     // dinner: data.filterToggle.dinner,
-    //   };
-    // });
-
-    // const interval = setInterval(function () {
-    //   sendGetRequest();
-    // }, 100000);
 
     const sendGetRequest = async () => {
       try {
@@ -233,7 +306,10 @@ export default defineComponent({
                   link: element.link,
                 });
               });
-            }else if (response.data.role.id === 16 || response.data.role.id === 17) {
+            } else if (
+              response.data.role.id === 16 ||
+              response.data.role.id === 17
+            ) {
               linksListEncCaj.forEach((element) => {
                 data.linkslist.unshift({
                   title: element.title,
@@ -255,7 +331,6 @@ export default defineComponent({
     };
 
     watch(data.jwt, (newValue) => {
-      console.log("newValue", newValue);
       sendGetRequest;
     });
 
@@ -273,6 +348,9 @@ export default defineComponent({
 </script>
 
 <style lang="sass">
-// .contenedor
-//   background-color: #6667AB
+.contenedor
+  background-image: url("~assets/whatsapp.jpeg")
+  // background-color: silver
+//   background-image: radial-gradient(circle at 100% 150%, silver 24%, white 24%, white 28%, silver 28%, silver 36%, white 36%, white 40%, transparent 40%, transparent),radial-gradient(circle at 0    150%, silver 24%, white 24%, white 28%, silver 28%, silver 36%, white 36%, white 40%, transparent 40%, transparent),radial-gradient(circle at 50%  100%, white 10%, silver 10%, silver 23%, white 23%, white 30%, silver 30%, silver 43%, white 43%, white 50%, silver 50%, silver 63%, white 63%, white 71%, transparent 71%, transparent),radial-gradient(circle at 100% 50%, white 5%, silver 5%, silver 15%, white 15%, white 20%, silver 20%, silver 29%, white 29%, white 34%, silver 34%, silver 44%, white 44%, white 49%, transparent 49%, transparent),radial-gradient(circle at 0    50%, white 5%, silver 5%, silver 15%, white 15%, white 20%, silver 20%, silver 29%, white 29%, white 34%, silver 34%, silver 44%, white 44%, white 49%, transparent 49%, transparent)
+//   background-size: 100px 50px
 </style>

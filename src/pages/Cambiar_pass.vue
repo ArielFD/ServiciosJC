@@ -54,10 +54,6 @@ export default {
   setup() {
     const router = useRouter();
     const route = useRoute();
-
-    onMounted(() => {
-      console.log(route.query.code);
-    });
     
     let data = reactive({
       isPwd: true,
@@ -74,7 +70,7 @@ export default {
           passwordConfirmation: data.confirmationPass,
         })
         .then((response) => {
-          console.log("Your user's password has been reset.");
+          console.log(response);
           store.state.alerts[1].message="Password Reiniciado!"
           $q.notify(store.state.alerts[1])
           router.push("/");

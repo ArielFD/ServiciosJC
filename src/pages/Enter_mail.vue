@@ -37,7 +37,7 @@ export default {
           email: data.email, // user's email
         })
         .then((response) => {
-          console.log("Your user received an email");
+          console.log("Your user received an email",response);
           store.state.alerts[1].message="Enviado email de confirmacion!"
           $q.notify(store.state.alerts[1])
         })

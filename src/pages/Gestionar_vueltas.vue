@@ -14,6 +14,7 @@
       v-model:selected="selected"
       :filter="filter"
       :filter-method="customFilter"
+      
     >
       <template v-slot:top>
         <div style="width: 100%" class="row justify-end">
@@ -220,16 +221,14 @@ export default {
         });
 
       api
-        .get("/api/ingresos", {
+        .get("/api/ingresos?sort[0]=id%3Adesc", {
           headers: {
             Authorization: "Bearer " + store.state.jwt,
           },
         })
         .then(function (response) {
-          console.log(data.rol);
           data.rows = [];
           for (let i = 0; i < response.data.data.length; i++) {
-            console.log(response.data.data[i].attributes.VueltasRestantes);
             data.rows.push({
               name: response.data.data[i].id,
               NombreCliente: response.data.data[i].attributes.NombreCliente,
@@ -247,7 +246,6 @@ export default {
               response.data.data[i].attributes.VueltasRestantes == 0 &&
               data.rol == "Encargado"
             ) {
-              console.log("true");
               data.rows.pop();
             }
           }
@@ -261,8 +259,6 @@ export default {
       return {
         search: data.search,
         breakfast: data.filterToggle.breakfast,
-        // lunch: data.filterToggle.lunch,
-        // dinner: data.filterToggle.dinner,
       };
     });
 
@@ -295,7 +291,6 @@ export default {
               data.temp = element.name;
             }
           });
-          console.log(data.temp);
           data.rows.push({
             name: data.temp + 1,
             Fecha: data.fecha.substring(0, 10).split("-").reverse().join("-"),
@@ -393,7 +388,6 @@ export default {
     function aumentarSaldo() {
       selected.value.forEach(function (item, index, array) {
         data.rows.forEach((element) => {
-          console.log(element);
           if (element.name === selected.value[index].name) {
             api
               .put(
@@ -478,7 +472,7 @@ export default {
       getDates,
       resetSearch,
       total,
-      Create,
+      Create
     };
   },
 };

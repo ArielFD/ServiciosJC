@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 module.exports = {
   /**
@@ -16,5 +16,29 @@ module.exports = {
    * This gives you an opportunity to set up your data model,
    * run jobs, or perform some special logic.
    */
-  bootstrap(/*{ strapi }*/) {},
+  bootstrap({ strapi }) {
+    const { Server } = require("socket.io");
+    const io = new Server(strapi.server.httpServer, {
+      cors: {
+        origin: "http://localhost:8080", //process.env.FRONTEND_DOMAIN
+        methods: ["GET", "POST"],
+        allowedHeaders: ["my-custom-header"],
+        credentials: true,
+      },
+    });
+
+    io.on('connection', async function(socket) {
+      console.log("conection");
+      // socket.on("join", ({ username, room }) => {
+      //   console.log("user connected");
+      //   console.log("username is ", username);
+      //   console.log("room is...", room);
+      // });
+      socket.on('disconnect',()=>{
+        console.log("disconect");
+      })
+    });
+
+    strapi.io = io;
+  },
 };

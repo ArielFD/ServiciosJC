@@ -1,96 +1,96 @@
 <template>
   <q-page class="row justify-center">
     <div class="col-md-6 col-sm-10">
-    <q-card  >
-      <q-card-section>
-        <div class="row items-center no-wrap">
-          <div class="col">
-            <div class="text-h6">Loguin</div>
-          </div>
-
-          <div class="col-auto">
-            <q-btn color="grey-7" round flat icon="more_vert">
-              <q-menu cover auto-close>
-                <q-list>
-                  <q-item clickable>
-                    <q-item-section>Remove Card</q-item-section>
-                  </q-item>
-                  <q-item clickable>
-                    <q-item-section>Send Feedback</q-item-section>
-                  </q-item>
-                  <q-item clickable>
-                    <q-item-section>Share</q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-          </div>
-        </div>
-      </q-card-section>
-
-      <q-card-section>
-        <form @submit.prevent.stop="onSubmit">
-          <q-input
-            ref="nameRef"
-            filled
-            v-model="data.email"
-            label="Email"
-            lazy-rules
-            :rules="store.state.emailRules"
-          >
-            <template v-slot:prepend>
-              <q-icon name="mail" />
-            </template>
-          </q-input>
-          <q-input
-            ref="passRef"
-            class="q-mt-sm"
-            v-model="data.password"
-            prefix="Password:"
-            filled
-            :type="data.isPwd ? 'password' : 'text'"
-            @keyup.enter="Login"
-            lazy-rules
-            :rules="store.state.passRules"
-          >
-            <template v-slot:append>
-              <q-icon
-                :name="data.isPwd ? 'visibility_off' : 'visibility'"
-                class="cursor-pointer"
-                @click="data.isPwd = !data.isPwd"
-              />
-            </template>
-          </q-input>
-          <a href="/#/entermail" style="text-decoration: none"
-            >Olvidaste la Contraseña?</a
-          >
-          <div>
-          <q-checkbox v-model="data.rememberMe" label="Recordarme" />
-          </div>
-          <q-separator />
-          <q-card-actions class="justify-end">
-            <div>
-              <q-btn
-                color="primary"
-                label="LOGIN"
-                class="col self-center"
-                type="submit"
-                flat
-              />
+      <q-card>
+        <q-card-section>
+          <div class="row items-center no-wrap">
+            <div class="col">
+              <div class="text-h6">Loguin</div>
             </div>
-            <div>
-              <q-btn
-                color="primary"
-                label="Register"
-                class="col self-end"
-                to="/register"
-                flat
-              />
+
+            <div class="col-auto">
+              <!-- <q-btn color="grey-7" round flat icon="more_vert">
+                <q-menu cover auto-close>
+                  <q-list>
+                    <q-item clickable>
+                      <q-item-section>Remove Card</q-item-section>
+                    </q-item>
+                    <q-item clickable>
+                      <q-item-section>Send Feedback</q-item-section>
+                    </q-item>
+                    <q-item clickable>
+                      <q-item-section>Share</q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn> -->
             </div>
-          </q-card-actions>
-        </form>
-      </q-card-section>
-    </q-card>
+          </div>
+        </q-card-section>
+
+        <q-card-section>
+          <form @submit.prevent.stop="onSubmit">
+            <q-input
+              ref="nameRef"
+              filled
+              v-model="data.email"
+              label="Email"
+              lazy-rules
+              :rules="store.state.emailRules"
+            >
+              <template v-slot:prepend>
+                <q-icon name="mail" />
+              </template>
+            </q-input>
+            <q-input
+              ref="passRef"
+              class="q-mt-sm"
+              v-model="data.password"
+              prefix="Password:"
+              filled
+              :type="data.isPwd ? 'password' : 'text'"
+              @keyup.enter="Login"
+              lazy-rules
+              :rules="store.state.passRules"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="data.isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="data.isPwd = !data.isPwd"
+                />
+              </template>
+            </q-input>
+            <a href="/#/entermail" style="text-decoration: none"
+              >Olvidaste la Contraseña?</a
+            >
+            <div>
+              <q-checkbox v-model="data.rememberMe" label="Recordarme" />
+            </div>
+            <q-separator />
+            <q-card-actions class="justify-end">
+              <div>
+                <q-btn
+                  color="primary"
+                  label="LOGIN"
+                  class="col self-center"
+                  type="submit"
+                  flat
+                />
+              </div>
+              <div>
+                <q-btn
+                  color="primary"
+                  label="Register"
+                  class="col self-end"
+                  to="/register"
+                  flat
+                />
+              </div>
+            </q-card-actions>
+          </form>
+        </q-card-section>
+      </q-card>
     </div>
   </q-page>
 </template>
@@ -107,6 +107,7 @@ export default {
   name: "Login",
   setup() {
     const store = inject("store");
+    const socket = inject("socket");
     const router = useRouter();
     const route = useRoute();
     const $q = useQuasar();
@@ -119,6 +120,10 @@ export default {
       email: "",
       username: "",
       rememberMe: false,
+    });
+
+    socket.on("join", async (data) => {
+      console.log("join");
     });
 
     onMounted(() => {
@@ -153,6 +158,8 @@ export default {
           localStorage.setItem("jwt", response.data.jwt);
           localStorage.setItem("userData", JSON.stringify(store.state.user));
           router.push("/usuario");
+          conect(store.state.jwt);
+          socket.emit("join", {});
         })
         .catch(function (error) {
           console.log(error.response);
@@ -161,13 +168,18 @@ export default {
         });
     }
 
+    function conect(token) {
+      socket.auth = { token };
+      socket.connect();
+    }
+
     function onSubmit() {
       nameRef.value.validate();
 
       if (nameRef.value.hasError) {
         $q.notify({
           color: "negative",
-          message: "You need to accept the license and terms first",
+          message: "Incorrect Username or Password",
         });
         // form has error
       } else {
@@ -181,6 +193,7 @@ export default {
       Login,
       onSubmit,
       nameRef,
+      conect,
     };
   },
 };
@@ -188,7 +201,6 @@ export default {
 
 <style lang="sass">
 .my-card
-  background: blue
   max-width: 600px
 </style>
 

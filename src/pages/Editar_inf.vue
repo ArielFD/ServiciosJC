@@ -206,8 +206,6 @@ export default {
         })
         .then((response) => {
           console.log(response);
-          store.state.alerts[1].message = "Enviado email de confirmacion!";
-          $q.notify(store.state.alerts[1]);
           api
             .get("/api/clientes/$", {
               headers: {
@@ -224,9 +222,6 @@ export default {
         })
         .catch((error) => {
           console.log("An error occurred:", error.response);
-          store.state.alerts[0].message =
-            "Error con el envio de emai de confirmacion!";
-          $q.notify(store.state.alerts[0]);
         });
     }
 

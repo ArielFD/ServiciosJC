@@ -14,7 +14,6 @@
       v-model:selected="selected"
       :filter="filter"
       :filter-method="customFilter"
-      
     >
       <template v-slot:top>
         <div style="width: 100%" class="row justify-end">
@@ -123,7 +122,7 @@
 import { onMounted, onUpdated, onUnmounted } from "vue";
 import { ref, inject, computed, reactive } from "vue";
 import axios from "axios";
-import { api } from 'boot/axios.js'
+import { api } from "boot/axios.js";
 import moment from "moment";
 import { getCurrentInstance } from "vue";
 const instance = getCurrentInstance();
@@ -131,6 +130,7 @@ const instance = getCurrentInstance();
 export default {
   setup() {
     const store = inject("store");
+    const socket = inject("socket");
     const selected = ref([]);
     let data = reactive({
       columns: [
@@ -200,10 +200,14 @@ export default {
     onMounted(() => {
       sendGetRequest();
     });
-
-    setInterval(function () {
+    
+    socket.on("updateIngresos", async (data) => {
       sendGetRequest();
-    }, 1000);
+    });
+
+    // setInterval(function () {
+    //   sendGetRequest();
+    // }, 100000);
 
     function sendGetRequest() {
       api
@@ -286,20 +290,21 @@ export default {
           },
         })
         .then(function (response) {
-          data.rows.forEach((element) => {
-            if (element.name > data.temp) {
-              data.temp = element.name;
-            }
-          });
-          data.rows.push({
-            name: data.temp + 1,
-            Fecha: data.fecha.substring(0, 10).split("-").reverse().join("-"),
-            NombreCliente: data.nombreCliente,
-            NombreTrabajador: data.username,
-            VueltasRestantes: data.cantVueltas,
-            Cantidad: data.cantVueltas * data.precioServicio,
-            category: "breakfast",
-          });
+          // data.rows.forEach((element) => {
+          //   if (element.name > data.temp) {
+          //     data.temp = element.name;
+          //   }
+          // });
+          // data.rows.push({
+          //   name: data.temp + 1,
+          //   Fecha: data.fecha.substring(0, 10).split("-").reverse().join("-"),
+          //   NombreCliente: data.nombreCliente,
+          //   NombreTrabajador: data.username,
+          //   VueltasRestantes: data.cantVueltas,
+          //   Cantidad: data.cantVueltas * data.precioServicio,
+          //   category: "breakfast",
+          // });
+          socket.emit("updateIngresos", {});
           data.cantVueltas = 1;
         })
         .catch(function (error) {
@@ -390,20 +395,16 @@ export default {
         data.rows.forEach((element) => {
           if (element.name === selected.value[index].name) {
             api
-              .put(
-                `/api/ingresos/${selected.value[index].name}`,
-                {
-                  headers: {
-                    Authorization: "Bearer " + store.state.jwt,
-                  },
-                  data: {
-                    VueltasRestantes:
-                      element.VueltasRestantes + data.cantVueltas,
-                    Cantidad:
-                      element.Cantidad + data.precioServicio * data.cantVueltas,
-                  },
-                }
-              )
+              .put(`/api/ingresos/${selected.value[index].name}`, {
+                headers: {
+                  Authorization: "Bearer " + store.state.jwt,
+                },
+                data: {
+                  VueltasRestantes: element.VueltasRestantes + data.cantVueltas,
+                  Cantidad:
+                    element.Cantidad + data.precioServicio * data.cantVueltas,
+                },
+              })
               .then(function (response) {})
               .catch(function (error) {
                 console.log(error);
@@ -411,6 +412,7 @@ export default {
           }
         });
       });
+      socket.emit("updateIngresos", {});
       data.cantVueltas = 0;
     }
 
@@ -420,35 +422,29 @@ export default {
           if (element.name === selected.value[index].name) {
             if (element.VueltasRestantes - data.cantVueltas < 0) {
               api
-                .put(
-                  `/api/ingresos/${selected.value[index].name}`,
-                  {
-                    headers: {
-                      Authorization: "Bearer " + store.state.jwt,
-                    },
-                    data: {
-                      VueltasRestantes: 0,
-                    },
-                  }
-                )
+                .put(`/api/ingresos/${selected.value[index].name}`, {
+                  headers: {
+                    Authorization: "Bearer " + store.state.jwt,
+                  },
+                  data: {
+                    VueltasRestantes: 0,
+                  },
+                })
                 .then(function (response) {})
                 .catch(function (error) {
                   console.log(error);
                 });
             } else {
               api
-                .put(
-                  `/api/ingresos/${selected.value[index].name}`,
-                  {
-                    headers: {
-                      Authorization: "Bearer " + store.state.jwt,
-                    },
-                    data: {
-                      VueltasRestantes:
-                        element.VueltasRestantes - data.cantVueltas,
-                    },
-                  }
-                )
+                .put(`/api/ingresos/${selected.value[index].name}`, {
+                  headers: {
+                    Authorization: "Bearer " + store.state.jwt,
+                  },
+                  data: {
+                    VueltasRestantes:
+                      element.VueltasRestantes - data.cantVueltas,
+                  },
+                })
                 .then(function (response) {})
                 .catch(function (error) {
                   console.log(error);
@@ -457,6 +453,7 @@ export default {
           }
         });
       });
+      socket.emit("updateIngresos", {});
       data.cantVueltas = 0;
     }
 
@@ -472,7 +469,7 @@ export default {
       getDates,
       resetSearch,
       total,
-      Create
+      Create,
     };
   },
 };

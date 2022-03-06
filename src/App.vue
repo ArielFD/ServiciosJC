@@ -13,6 +13,7 @@ export default defineComponent({
   setup(){
 
     provide("store",store)
+    provide("socket",socket)
     
     onMounted(() => {
       store.methods.getToken()

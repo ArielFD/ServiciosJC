@@ -1,6 +1,12 @@
 <template>
   <q-page class="row justify-center">
-    <div class="col-md-6 col-sm-10">
+    <div
+      class="row justify-center text-h3 text-weight-bolder q-pa-lg"
+      v-if="data.fallo"
+    >
+      <p class="text-primary text-capitalize">Intentelo mas tarde</p>
+    </div>
+    <div class="col-md-6 col-sm-10" v-if="!data.fallo">
       <q-card>
         <q-card-section>
           <div class="row items-center no-wrap">
@@ -120,6 +126,7 @@ export default {
       email: "",
       username: "",
       rememberMe: false,
+      fallo: false,
     });
 
     socket.on("join", async (data) => {
@@ -127,6 +134,9 @@ export default {
     });
 
     onMounted(() => {
+      if (!localStorage.getItem("fallo")) {
+        localStorage.setItem("fallo", "0");
+      }
       if (
         localStorage.getItem("userData") &&
         JSON.parse(localStorage.getItem("userData")).rememberMe
@@ -157,15 +167,30 @@ export default {
           store.state.user.rememberMe = data.rememberMe;
           localStorage.setItem("jwt", response.data.jwt);
           localStorage.setItem("userData", JSON.stringify(store.state.user));
+          localStorage.setItem("fallo", "0");
           router.push("/usuario");
           conect(store.state.jwt);
           socket.emit("join", {});
         })
         .catch(function (error) {
           console.log(error.response);
+          let temp = parseInt(localStorage.getItem("fallo"));
+          temp++;
+          localStorage.setItem("fallo", temp);
+          if (temp > 5) {
+            data.fallo = true;
+            resetTimeOut();
+          }
           store.state.alerts[0].message = "Credenciales incorrectas";
           $q.notify(store.state.alerts[0]);
         });
+    }
+
+    function resetTimeOut(params) {
+      setTimeout(() => {
+        data.fallo = false;
+        localStorage.setItem("fallo", "0");
+      }, 300000);
     }
 
     function conect(token) {
@@ -194,6 +219,7 @@ export default {
       onSubmit,
       nameRef,
       conect,
+      resetTimeOut,
     };
   },
 };

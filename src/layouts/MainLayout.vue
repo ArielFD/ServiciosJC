@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="red-color">
+  <q-layout view="lHh Lpr lFf" class="red-color contenedor">
     <q-header elevated>
       <q-toolbar class="text-center">
         <q-btn
@@ -29,11 +29,14 @@
       </q-list>
     </q-drawer>
 
-    <q-page-container class="contenedor q-pa-md q-mt-md">
-      <div class="row justify-center q-mb-md">
+    <q-page-container class="q-pa-md q-mt-md">
+      <div class="row justify-center q-pa-lg">
         <q-img src="~assets/Simpal.png" width="50%" style="max-width: 300px" />
       </div>
-      <router-view/>
+      <div class="row justify-center text-h3 text-weight-bolder q-pa-lg" v-if="!data.sesionActiva">
+        <p class="text-primary text-capitalize">La aplicacion ya esta en uso</p>
+      </div>
+      <router-view v-if="data.sesionActiva"/>
     </q-page-container>
   </q-layout>
 </template>
@@ -139,6 +142,7 @@ export default defineComponent({
       linkslist: [],
       jwt: store.state.jwt,
       drawer: false,
+      sesionActiva:false
     });
     // + store.state.jwt,
 
@@ -208,7 +212,84 @@ export default defineComponent({
         .catch(function (error) {
           console.log(error);
         });
+
+      let localStorageTimeout = 15 * 1000; // 15,000 milliseconds = 15 seconds.
+      let localStorageResetInterval = 10 * 1000; // 10,000 milliseconds = 10 seconds.
+      let localStorageTabKey = "test-application-browser-tab";
+      let sessionStorageGuidKey = "browser-tab-guid";
+
+      function createGUID() {
+        let guid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+          /[xy]/g,
+          (c) => {
+            /*eslint-disable*/
+            let r = (Math.random() * 16) | 0,
+              v = c == "x" ? r : (r & 0x3) | 0x8;
+            /*eslint-enable*/
+            return v.toString(16);
+          }
+        );
+
+        return guid;
+      }
+
+      /**
+ * Compare our tab identifier associated with this session (particular tab)
+ * with that of one that is in localStorage (the active one for this browser).
+ * This browser tab is good if any of the following are true:
+ * 1.  There is no localStorage Guid yet (first browser tab).
+ * 2.  The localStorage Guid matches the session Guid.  Same tab, refreshed.
+ * 3.  The localStorage timeout period has ended.
+ *
+ * If our current session is the correct active one, an interval will continue
+ * to re-insert the localStorage value with an updated timestamp.
+ *
+ * Another thing, that should be done (so you can open a tab within 15 seconds of closing it) would be to do the following (or hook onto an existing onunload method):
+ *      window.onunload = () => { 
+                localStorage.removeItem(localStorageTabKey);
+      };
+ */
+      function testTab() {
+        let sessionGuid =
+          sessionStorage.getItem(sessionStorageGuidKey) || createGUID();
+        let tabObj =
+          JSON.parse(localStorage.getItem(localStorageTabKey)) || null;
+
+        sessionStorage.setItem(sessionStorageGuidKey, sessionGuid);
+
+        // If no or stale tab object, our session is the winner.  If the guid matches, ours is still the winner
+        if (
+          tabObj === null ||
+          tabObj.timestamp < new Date().getTime() - localStorageTimeout ||
+          tabObj.guid === sessionGuid
+        ) {
+          function setTabObj() {
+            let newTabObj = {
+              guid: sessionGuid,
+              timestamp: new Date().getTime(),
+            };
+            localStorage.setItem(localStorageTabKey, JSON.stringify(newTabObj));
+          }
+          setTabObj();
+          setInterval(setTabObj, localStorageResetInterval);
+          return true;
+        } else {
+          // An active tab is already open that does not match our session guid.
+          return false;
+        }
+      }
+
+      if (testTab()) {
+        console.log("tab is good");
+        data.sesionActiva=true
+        //document.getElementById("result").innerHTML = "tab is good";
+      } else {
+        console.log("tab is bad");
+        data.sesionActiva=false
+        //document.getElementById("result").innerHTML = "tab is bad";
+      }
     });
+
     onUpdated(() => {
       api
         .get("/api/clientes/$", {

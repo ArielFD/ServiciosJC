@@ -120,6 +120,10 @@ export default {
     });
 
     onMounted(() => {
+      getIngresos()
+    });
+
+    function getIngresos(params) {
       api
         .get("/api/ingresos?sort[0]=id%3Adesc", {
           headers: {
@@ -148,7 +152,7 @@ export default {
         .catch(function (error) {
           console.log(error);
         });
-    });
+    }
 
     let filter = computed(() => {
       return {

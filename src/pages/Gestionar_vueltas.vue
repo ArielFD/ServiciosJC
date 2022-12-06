@@ -405,7 +405,9 @@ export default {
                     element.Cantidad + data.precioServicio * data.cantVueltas,
                 },
               })
-              .then(function (response) {})
+              .then(function (response) {
+                sendGetRequest();
+              })
               .catch(function (error) {
                 console.log(error);
               });
@@ -430,7 +432,9 @@ export default {
                     VueltasRestantes: 0,
                   },
                 })
-                .then(function (response) {})
+                .then(function (response) {
+                  sendGetRequest();
+                })
                 .catch(function (error) {
                   console.log(error);
                 });

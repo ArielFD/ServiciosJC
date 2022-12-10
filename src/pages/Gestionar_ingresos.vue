@@ -2,38 +2,16 @@
   <q-page>
     <h5>Ingresos</h5>
     <div class="row ">
-      <q-input
-        v-model="data.star"
-        filled
-        type="date"
-        hint="Desde"
-        class="col q-pa-xs q-mb-sm"
-      />
-      <q-input
-        v-model="data.end"
-        filled
-        type="date"
-        hint="Hasta"
-        class="col q-pa-xs q-mb-sm"
-      />
+      <q-input v-model="data.star" filled type="date" hint="Desde" class="col q-pa-xs q-mb-sm" />
+      <q-input v-model="data.end" filled type="date" hint="Hasta" class="col q-pa-xs q-mb-sm" />
       <div class="q-pa-md q-gutter-sm">
-      <q-btn flat round color="primary" icon="search" @click="getDates(data.star,data.end)"/>
-      <q-btn flat round color="primary" icon="cached" @click="resetSearch"/>
+        <q-btn flat round color="primary" icon="search" @click="getDates(data.star, data.end)" />
+        <q-btn flat round color="primary" icon="cached" @click="resetSearch" />
       </div>
     </div>
-    <q-table
-      title="Rol"
-      dense
-      :rows="data.rows"
-      :columns="data.columns"
-      row-key="name"
-      class="q-mb-md q-mt-md"
-      :selected-rows-label="getSelectedString"
-      selection="single"
-      v-model:selected="selected"
-      :filter="filter"
-      :filter-method="customFilter"
-    >
+    <q-table title="Rol" dense :rows="data.rows" :columns="data.columns" row-key="name" class="q-mb-md q-mt-md"
+      :selected-rows-label="getSelectedString" selection="single" v-model:selected="selected" :filter="filter"
+      :filter-method="customFilter">
       <template v-slot:top>
         <div style="width: 100%" class="row justify-end">
           <div class="col" style="max-width: 300px">
@@ -47,10 +25,10 @@
       </template>
     </q-table>
 
-    <q-field filled >
+    <q-field filled>
       <template v-slot:control>
         <div class="self-center full-width no-outline text-center text-h4 text-weight-bolder">
-          {{data.total}}
+          {{ data.total }}
         </div>
       </template>
     </q-field>
@@ -59,7 +37,7 @@
 
 <script>
 import { onMounted, onUpdated, onUnmounted } from "vue";
-import { ref, inject, computed, reactive,watch } from "vue";
+import { ref, inject, computed, reactive, watch } from "vue";
 import axios from "axios";
 import { api } from 'boot/axios.js'
 import moment from "moment";
@@ -112,11 +90,11 @@ export default {
       rows: [],
       star: "",
       end: "",
-      search:"",
+      search: "",
       filterToggle: {
         breakfast: true,
       },
-      total:0
+      total: 0
     });
 
     onMounted(() => {
@@ -128,12 +106,12 @@ export default {
         .get("/api/ingresos?sort[0]=id%3Adesc", {
           headers: {
             Authorization:
-              "Bearer "+store.state.jwt,
-              },
+              "Bearer " + store.state.jwt,
+          },
         })
         .then(function (response) {
           for (let i = 0; i < response.data.data.length; i++) {
-            data.total+=response.data.data[i].attributes.Cantidad
+            data.total += response.data.data[i].attributes.Cantidad
             data.rows.push({
               name: response.data.data[i].id,
               NombreCliente: response.data.data[i].attributes.NombreCliente,
@@ -161,54 +139,36 @@ export default {
       };
     });
 
-    watch(data,(newValue) => {
-      data.total=0
+    watch(data.rows, (newValue) => {
+      data.total = 0
       data.rows.forEach(element => {
-        if(element.category=="breakfast"){
-          data.total+=element.Cantidad
+        if (element.category == "breakfast") {
+          data.total += element.Cantidad
         }
       });
     })
 
     function getDates(startDate, stopDate) {
-      var currentDate = moment(startDate).format("DD-MM-YYYY");
-      var stopDate = moment(stopDate).format("DD-MM-YYYY");
+      let currentStart = new Date(startDate)
+      let currentStop = new Date(stopDate)
       data.rows.forEach((element) => {
-        const arr=element.Fecha.split("-")
-        let temp=arr[0]
-        arr[0]=arr[1]
-        arr[1]=temp
-        arr.join("-")
+        let dateCompate=new Date(element.Fecha.split("-")
+                .reverse()
+                .join("-"))
         if (
-          moment(arr.join("-")).format("DD-MM-YYYY") >= currentDate &&
-          moment(arr.join("-")).format("DD-MM-YYYY") <= stopDate
+          dateCompate >= currentStart &&
+          dateCompate <= currentStop
         ) {
-          element.category="breakfast"
+          element.category = "breakfast"
         } else {
           element.category = "";
         }
       });
     }
 
-    // function getDates(startDate, stopDate) {
-    //   // var dateArray = data.rows;
-    //   var currentDate = moment(startDate).format("DD-MM-YYYY");
-    //   var stopDate = moment(stopDate).format("DD-MM-YYYY");
-    //   data.rows.forEach((element) => {
-    //     if (
-    //       moment(element.Fecha).format("MM-DD-YYYY") >= currentDate &&
-    //       moment(element.Fecha).format("MM-DD-YYYY") <= stopDate
-    //     ) {
-    //       element.category = "breakfast";
-    //     } else {
-    //       element.category = "";
-    //     }
-    //   });
-    // }
-
-    function resetSearch(){
+    function resetSearch() {
       data.rows.forEach(element => {
-        element.category="breakfast"
+        element.category = "breakfast"
       });
     }
 
@@ -253,10 +213,9 @@ export default {
     function getSelectedString() {
       return selected.value.length === 0
         ? ""
-        : `${selected.value.length} record${
-            selected.value.length > 1 ? "s" : ""
-          } selected of ${data.rows.length}`;
-      
+        : `${selected.value.length} record${selected.value.length > 1 ? "s" : ""
+        } selected of ${data.rows.length}`;
+
     }
 
     return {
